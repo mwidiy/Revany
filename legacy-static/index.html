@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revani Edu — Dashboard Overview Manajemen Les & Bimbel</title>
+  
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- SIDEBAR NAVIGASI -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="brand-wrapper">
+          <div class="brand-icon">R</div>
+          <div class="brand-text">
+            <h1>Revani Edu</h1>
+            <span>Bimbel & Les Privat</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-category">Utama</div>
+        <a href="#" class="nav-item active" id="nav-dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard Overview</span>
+        </a>
+        <a href="#jadwal" class="nav-item" id="nav-jadwal">
+          <i data-lucide="calendar"></i>
+          <span>Jadwal Les</span>
+          <span class="nav-badge" id="badge-jadwal-count">16</span>
+        </a>
+        <a href="#presensi" class="nav-item" id="nav-presensi">
+          <i data-lucide="user-check"></i>
+          <span>Presensi Siswa</span>
+        </a>
+
+        <div class="nav-category">Akademik & Pengguna</div>
+        <a href="#tentor" class="nav-item" id="nav-tentor">
+          <i data-lucide="graduation-cap"></i>
+          <span>Data Tentor</span>
+          <span class="nav-badge" id="badge-tentor-count">24</span>
+        </a>
+        <a href="#siswa" class="nav-item" id="nav-siswa">
+          <i data-lucide="users"></i>
+          <span>Data Siswa</span>
+          <span class="nav-badge" id="badge-siswa-count">148</span>
+        </a>
+        <a href="#laporan-belajar" class="nav-item" id="nav-laporan">
+          <i data-lucide="book-open-check"></i>
+          <span>Laporan Belajar</span>
+        </a>
+        <a href="#rekap-pertemuan" class="nav-item" id="nav-rekap">
+          <i data-lucide="history"></i>
+          <span>Rekap Pertemuan</span>
+        </a>
+
+        <div class="nav-category">Keuangan & Dokumen</div>
+        <a href="#fee-tentor" class="nav-item" id="nav-fee">
+          <i data-lucide="wallet"></i>
+          <span>Fee Tentor</span>
+        </a>
+        <a href="#laporan-bulanan" class="nav-item" id="nav-laporan-bulanan">
+          <i data-lucide="bar-chart-3"></i>
+          <span>Laporan Bulanan</span>
+        </a>
+        <a href="#cetak-pdf" class="nav-item" id="nav-cetak-pdf">
+          <i data-lucide="file-down"></i>
+          <span>Cetak Laporan PDF</span>
+        </a>
+
+        <div class="nav-category">Sistem</div>
+        <a href="#pengaturan" class="nav-item" id="nav-settings">
+          <i data-lucide="settings"></i>
+          <span>Pengaturan Sistem</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-snippet" id="user-profile-btn" title="Klik untuk profil admin">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Admin" class="user-avatar" id="admin-avatar">
+          <div class="user-info">
+            <div class="user-name" id="admin-name">Kak Admin</div>
+            <div class="user-role" id="admin-role">Super Admin</div>
+          </div>
+          <i data-lucide="more-vertical" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-wrapper">
+      
+      <!-- TOP NAVIGATION BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn" id="mobile-toggle-btn" style="display: none;" title="Toggle Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          
+          <div class="live-indicator" id="live-indicator-pill">
+            <span class="pulse-dot"></span>
+            <span id="live-session-text">4 Sesi Sedang Berlangsung</span>
+          </div>
+
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);" id="current-datetime">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Command search trigger -->
+          <button class="search-trigger-btn" id="search-trigger-btn">
+            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+            <span>Cari siswa, tentor, jadwal...</span>
+            <span class="kbd-shortcut">Ctrl K</span>
+          </button>
+
+          <!-- Theme Mode Switcher -->
+          <button class="icon-btn" id="theme-toggle-btn" title="Ganti Mode Tampilan (Dark/Light)">
+            <i data-lucide="moon" id="theme-icon"></i>
+          </button>
+
+          <!-- Notifications Button -->
+          <button class="icon-btn" id="notif-btn" title="Pemberitahuan">
+            <i data-lucide="bell"></i>
+            <span class="badge-dot"></span>
+          </button>
+
+          <!-- Quick Help / Support -->
+          <button class="icon-btn" id="help-btn" title="Pusat Bantuan">
+            <i data-lucide="help-circle"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- DASHBOARD OVERVIEW CONTENT -->
+      <main class="content-area">
+        
+        <!-- HERO BANNER & GREETING -->
+        <section class="hero-banner">
+          <div class="hero-text">
+            <h2 id="greeting-text">Selamat Datang, Kak Admin! 👋</h2>
+            <p id="greeting-subtext">Hari ini ada 16 pertemuan les terjadwal. 4 sesi sedang berjalan dan 10 sudah selesai.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-outline-emerald" id="btn-quick-presensi">
+              <i data-lucide="check-square"></i>
+              <span>+ Catat Presensi</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-quick-jadwal">
+              <i data-lucide="calendar-plus"></i>
+              <span>+ Buat Jadwal</span>
+            </button>
+            <button class="btn btn-primary" id="btn-quick-siswa">
+              <i data-lucide="user-plus"></i>
+              <span>+ Siswa Baru</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 4 KPI METRIC CARDS -->
+        <section class="kpi-grid">
+          <!-- Card 1: Siswa Aktif -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Total Siswa Aktif</span>
+              <div class="kpi-icon-wrap kpi-icon-indigo">
+                <i data-lucide="users"></i>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-siswa-val">148</span>
+              <span class="kpi-trend trend-up">
+                <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i>
+                <span>+12.5%</span>
+              </span>
+            </div>
+            <p class="kpi-subtext">Pertumbuhan siswa aktif bulan ini</p>
+            <div class="kpi-footer">
+              <span>98 Siswa Reguler</span>
+              <span>50 Siswa Intensif</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Tentor Aktif -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Tentor Siaga</span>
+              <div class="kpi-icon-wrap kpi-icon-emerald">
+                <i data-lucide="graduation-cap"></i>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-tentor-val">24</span>
+              <span class="kpi-trend trend-up">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+                <span>18 Mengajar</span>
+              </span>
+            </div>
+            <p class="kpi-subtext">18 tentor aktif bertugas hari ini</p>
+            <div class="kpi-footer">
+              <span>6 Tentor Standby</span>
+              <span>Kepuasan 4.9 / 5.0</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Sesi & Presensi Hari Ini -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Presensi Hari Ini</span>
+              <div class="kpi-icon-wrap kpi-icon-amber">
+                <i data-lucide="calendar-check"></i>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-presensi-val">94.2%</span>
+              <span class="kpi-trend trend-up">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+                <span>Tertib</span>
+              </span>
+            </div>
+            <p class="kpi-subtext">16 Pertemuan terjadwal hari ini</p>
+            <div class="kpi-footer">
+              <span>10 Selesai</span>
+              <span>4 Sedang Jalan</span>
+              <span>2 Nanti</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Estimasi Omzet & Fee -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Estimasi Finansial</span>
+              <div class="kpi-icon-wrap kpi-icon-blue">
+                <i data-lucide="dollar-sign"></i>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-omzet-val">Rp 24.8M</span>
+              <span class="kpi-trend trend-up">
+                <i data-lucide="arrow-up-right" style="width: 14px; height: 14px;"></i>
+                <span>+8.4%</span>
+              </span>
+            </div>
+            <p class="kpi-subtext">Estimasi akumulasi omzet bulan berjalan</p>
+            <div class="kpi-footer">
+              <span>Fee Tentor: Rp 14.2M</span>
+              <span style="color: var(--success); font-weight: 700;">Margin 42.8%</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- MIDDLE SECTION: CHARTS & LIVE SCHEDULE -->
+        <section class="middle-grid">
+          
+          <!-- LEFT: Dynamic Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Tren Pertemuan & Kehadiran Sesi</h3>
+                <p>Visualisasi jumlah sesi belajar terlaksana per hari</p>
+              </div>
+              <div class="filter-pills" id="chart-filter-group">
+                <button class="filter-btn active" data-period="week">7 Hari</button>
+                <button class="filter-btn" data-period="month">Bulan Ini</button>
+                <button class="filter-btn" data-period="semester">Semester</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </div>
+
+          <!-- RIGHT: Live Today's Schedule -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Sesi Les Hari Ini</h3>
+                <p>Jadwal langsung & presensi cepat</p>
+              </div>
+              <div class="filter-pills" id="schedule-filter-group">
+                <button class="filter-btn active" data-filter="all">Semua</button>
+                <button class="filter-btn" data-filter="ongoing">Sedang Jalan</button>
+                <button class="filter-btn" data-filter="upcoming">Mendatang</button>
+              </div>
+            </div>
+            
+            <div class="schedule-list" id="schedule-list-container">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- BOTTOM SECTION: 3 COLUMNS -->
+        <section class="bottom-grid">
+          
+          <!-- COL 1: Distribusi Jenjang / Mapel -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Distribusi Jenjang Siswa</h3>
+                <p>Segmentasi siswa aktif Revani</p>
+              </div>
+            </div>
+            <div class="donut-wrapper">
+              <canvas id="jenjangChart"></canvas>
+            </div>
+            <div class="donut-legend" id="jenjang-legend">
+              <div class="legend-item"><span class="legend-color" style="background: #6366F1;"></span> SMA / SMK (42%)</div>
+              <div class="legend-item"><span class="legend-color" style="background: #3B82F6;"></span> SMP (28%)</div>
+              <div class="legend-item"><span class="legend-color" style="background: #10B981;"></span> SD (18%)</div>
+              <div class="legend-item"><span class="legend-color" style="background: #F59E0B;"></span> UTBK/Kedinasan (12%)</div>
+            </div>
+          </div>
+
+          <!-- COL 2: Top Tentor Leaderboard -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Top Tentor Bulan Ini</h3>
+                <p>Berdasarkan jam ajar & kepuasan siswa</p>
+              </div>
+              <a href="#fee-tentor" style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none;">Lihat Semua</a>
+            </div>
+            <div class="leaderboard-list" id="tentor-leaderboard-container">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- COL 3: Aktivitas & Presensi Terkini -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Log Aktivitas Terkini</h3>
+                <p>Presensi & laporan belajar masuk</p>
+              </div>
+              <button class="icon-btn" style="width: 32px; height: 32px;" id="refresh-activity-btn" title="Segarkan Log">
+                <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+            <div class="activity-feed" id="activity-feed-container">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CATAT PRESENSI CEPAT
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-presensi">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="kpi-icon-wrap kpi-icon-emerald" style="width: 36px; height: 36px;">
+            <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+          </div>
+          <h3>Catat Presensi Siswa</h3>
+        </div>
+        <button class="modal-close-btn" data-close="modal-presensi">&times;</button>
+      </div>
+
+      <form id="form-presensi">
+        <div class="form-group">
+          <label class="form-label">Pilih Sesi Les / Siswa</label>
+          <select class="form-select" id="presensi-select-sesi" required>
+            <option value="">-- Pilih Sesi Pertemuan Hari Ini --</option>
+            <!-- Filled dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status Kehadiran</label>
+          <div class="status-radio-group">
+            <label class="status-radio-label">
+              <input type="radio" name="presensiStatus" value="Hadir" checked>
+              <span style="color: var(--success);">Hadir</span>
+            </label>
+            <label class="status-radio-label">
+              <input type="radio" name="presensiStatus" value="Izin">
+              <span style="color: var(--warning);">Izin</span>
+            </label>
+            <label class="status-radio-label">
+              <input type="radio" name="presensiStatus" value="Sakit">
+              <span style="color: var(--info);">Sakit</span>
+            </label>
+            <label class="status-radio-label">
+              <input type="radio" name="presensiStatus" value="Alpha">
+              <span style="color: var(--danger);">Alpha</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Materi / Catatan Belajar</label>
+          <textarea class="form-textarea" rows="3" id="presensi-catatan" placeholder="Contoh: Menyelesaikan latihan soal Bab 4, siswa sangat antusias dan memahami konsep turunan fungsi."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" data-close="modal-presensi">Batal</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save"></i>
+            <span>Simpan Presensi</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: BUAT JADWAL BARU
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-jadwal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="kpi-icon-wrap kpi-icon-indigo" style="width: 36px; height: 36px;">
+            <i data-lucide="calendar-plus" style="width: 18px; height: 18px;"></i>
+          </div>
+          <h3>Buat Jadwal Les Baru</h3>
+        </div>
+        <button class="modal-close-btn" data-close="modal-jadwal">&times;</button>
+      </div>
+
+      <form id="form-jadwal">
+        <div class="form-group">
+          <label class="form-label">Nama Siswa</label>
+          <input type="text" class="form-input" id="jadwal-nama-siswa" placeholder="Contoh: Farhan Pratama" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tentor Pengajar</label>
+          <select class="form-select" id="jadwal-tentor" required>
+            <option value="Kak Dimas Arya, S.Si">Kak Dimas Arya, S.Si (Matematika & Fisika)</option>
+            <option value="Kak Sarah Nurul, M.Pd">Kak Sarah Nurul, M.Pd (Kimia & Biologi)</option>
+            <option value="Mr. Kevin Sanjaya, B.Ed">Mr. Kevin Sanjaya, B.Ed (Bahasa Inggris)</option>
+            <option value="Kak Reza Pahlevi, S.Pd">Kak Reza Pahlevi, S.Pd (IPA SMP)</option>
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Mata Pelajaran</label>
+            <input type="text" class="form-input" id="jadwal-mapel" placeholder="Matematika SMA" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Waktu Sesi</label>
+            <input type="text" class="form-input" id="jadwal-waktu" placeholder="16:00 - 17:30" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Metode Les</label>
+          <select class="form-select" id="jadwal-metode">
+            <option value="Offline (Rumah Siswa)">Offline (Rumah Siswa)</option>
+            <option value="Offline (Revani Hub)">Offline (Revani Hub)</option>
+            <option value="Online (Zoom Revani)">Online (Zoom Revani)</option>
+            <option value="Online (Google Meet)">Online (Google Meet)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" data-close="modal-jadwal">Batal</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i>
+            <span>Jadwalkan Sesi</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: TAMBAH SISWA BARU
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-siswa">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="kpi-icon-wrap kpi-icon-blue" style="width: 36px; height: 36px;">
+            <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+          </div>
+          <h3>Tambah Siswa Baru</h3>
+        </div>
+        <button class="modal-close-btn" data-close="modal-siswa">&times;</button>
+      </div>
+
+      <form id="form-siswa">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap Siswa</label>
+          <input type="text" class="form-input" id="siswa-nama" placeholder="Masukkan nama lengkap" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Jenjang Pendidikan</label>
+            <select class="form-select" id="siswa-jenjang" required>
+              <option value="SD">SD</option>
+              <option value="SMP">SMP</option>
+              <option value="SMA">SMA</option>
+              <option value="UTBK / Kedinasan">UTBK / Kedinasan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kelas</label>
+            <input type="text" class="form-input" id="siswa-kelas" placeholder="Contoh: XII MIPA 1" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">No. WhatsApp Orang Tua / Siswa</label>
+          <input type="tel" class="form-input" id="siswa-telepon" placeholder="0812-XXXX-XXXX" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Paket Les</label>
+          <select class="form-select" id="siswa-paket">
+            <option value="Reguler 8 Sesi / Bulan">Reguler (8 Sesi / Bulan)</option>
+            <option value="Intensif 12 Sesi / Bulan">Intensif (12 Sesi / Bulan)</option>
+            <option value="Privat Eksklusif (16 Sesi)">Privat Eksklusif (16 Sesi)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" data-close="modal-siswa">Batal</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i>
+            <span>Daftarkan Siswa</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       COMMAND PALETTE (CTRL + K SEARCH MODAL)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-search">
+    <div class="modal-dialog" style="max-width: 580px; padding: 20px;">
+      <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+        <i data-lucide="search" style="color: var(--text-muted); width: 20px; height: 20px;"></i>
+        <input type="text" id="command-search-input" placeholder="Ketik nama siswa, tentor, atau mapel..." style="width: 100%; border: none; background: transparent; color: var(--text-main); font-size: 15px; outline: none; font-family: inherit;">
+        <span class="kbd-shortcut">ESC</span>
+      </div>
+      <div id="command-search-results" style="margin-top: 14px; max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/data.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
