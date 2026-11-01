@@ -116,10 +116,11 @@
           
           <div class="live-indicator" id="live-indicator-pill">
             <span class="pulse-dot"></span>
-            <span id="live-session-text">4 Sesi Sedang Berlangsung</span>
+            <span class="live-text-full" id="live-session-text">4 Sesi Sedang Berlangsung</span>
+            <span class="live-text-short">4 Live</span>
           </div>
 
-          <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);" id="current-datetime">
+          <div class="topbar-datetime" id="current-datetime">
             <!-- Rendered by JS -->
           </div>
         </div>
@@ -128,7 +129,7 @@
           <!-- Command search trigger -->
           <button class="search-trigger-btn" id="search-trigger-btn">
             <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-            <span>Cari siswa, tentor, jadwal...</span>
+            <span class="search-text">Cari siswa, tentor, jadwal...</span>
             <span class="kbd-shortcut">Ctrl K</span>
           </button>
 
@@ -144,7 +145,7 @@
           </button>
 
           <!-- Quick Help / Support -->
-          <button class="icon-btn" id="help-btn" title="Pusat Bantuan">
+          <button class="icon-btn topbar-help-btn" id="help-btn" title="Pusat Bantuan">
             <i data-lucide="help-circle"></i>
           </button>
         </div>

@@ -35,30 +35,36 @@ export default function Topbar() {
     <header className="topbar">
       <div className="topbar-left">
         <button
-          className="icon-btn"
+          className="icon-btn mobile-menu-btn"
           id="mobile-toggle-btn"
-          style={{ display: 'none' }}
           onClick={toggleMobileSidebar}
           title="Toggle Menu"
+          aria-label="Toggle Menu"
         >
           <Menu size={18} />
         </button>
 
-        <div className="live-indicator">
+        <div className="live-indicator" title={`${ongoingCount} Sesi Les Sedang Berlangsung`}>
           <span className="pulse-dot"></span>
-          <span>{ongoingCount} Sesi Sedang Berlangsung</span>
+          <span className="live-text-full">{ongoingCount} Sesi Sedang Berlangsung</span>
+          <span className="live-text-short">{ongoingCount} Live</span>
         </div>
 
-        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>
+        <div className="topbar-datetime">
           {dateTimeString}
         </div>
       </div>
 
       <div className="topbar-right">
         {/* Search Command Palette Trigger */}
-        <button className="search-trigger-btn" onClick={openSearchModal}>
+        <button
+          className="search-trigger-btn"
+          onClick={openSearchModal}
+          title="Cari siswa, tentor, jadwal (Ctrl + K)"
+          aria-label="Cari"
+        >
           <Search size={16} />
-          <span>Cari siswa, tentor, jadwal...</span>
+          <span className="search-text">Cari siswa, tentor, jadwal...</span>
           <span className="kbd-shortcut">Ctrl K</span>
         </button>
 
@@ -67,6 +73,7 @@ export default function Topbar() {
           className="icon-btn"
           onClick={toggleTheme}
           title={`Ganti ke mode ${theme === 'light' ? 'Dark' : 'Light'}`}
+          aria-label="Toggle Theme"
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
@@ -76,16 +83,18 @@ export default function Topbar() {
           className="icon-btn"
           onClick={() => showToast('Semua notifikasi hari ini telah dibaca', 'info')}
           title="Pemberitahuan"
+          aria-label="Notifikasi"
         >
           <Bell size={18} />
           <span className="badge-dot"></span>
         </button>
 
-        {/* Support Help Button */}
+        {/* Support Help Button (hidden on small mobile) */}
         <button
-          className="icon-btn"
+          className="icon-btn topbar-help-btn"
           onClick={() => showToast('Pusat Bantuan Revani Edu siap membantu!', 'info')}
           title="Pusat Bantuan"
+          aria-label="Bantuan"
         >
           <HelpCircle size={18} />
         </button>

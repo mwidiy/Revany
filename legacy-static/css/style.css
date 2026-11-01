@@ -335,6 +335,22 @@ body {
   font-size: 12px;
   font-weight: 700;
   border: 1px solid rgba(16, 185, 129, 0.25);
+  white-space: nowrap;
+}
+
+.live-text-full {
+  display: inline;
+}
+
+.live-text-short {
+  display: none;
+}
+
+.topbar-datetime {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .pulse-dot {
@@ -1190,6 +1206,16 @@ body {
   }
 }
 
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .topbar-datetime {
+    display: none;
+  }
+  .search-trigger-btn .kbd-shortcut {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   #mobile-toggle-btn {
     display: flex !important;
@@ -1205,17 +1231,91 @@ body {
     margin-left: 0;
   }
   .topbar {
-    padding: 0 16px;
+    height: 64px;
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .topbar-left {
+    gap: 10px;
+    min-width: 0;
+  }
+  .topbar-right {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .search-trigger-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    justify-content: center;
+    border-radius: var(--radius-md);
+  }
+  .search-trigger-btn .search-text {
+    display: none;
+  }
+  .icon-btn {
+    width: 38px;
+    height: 38px;
   }
   .content-area {
     padding: 16px;
+    gap: 20px;
   }
   .hero-banner {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    padding: 22px 18px;
+  }
+  .hero-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .hero-actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
   }
   .kpi-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .live-text-full {
+    display: none;
+  }
+  .live-text-short {
+    display: inline;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .live-indicator {
+    padding: 5px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+  .topbar-help-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .topbar {
+    padding: 0 8px;
+  }
+  .topbar-left {
+    gap: 6px;
+  }
+  .topbar-right {
+    gap: 6px;
+  }
+  .live-indicator {
+    padding: 4px 8px;
+    font-size: 10.5px;
+  }
+  .search-trigger-btn,
+  .icon-btn {
+    width: 36px;
+    height: 36px;
   }
 }
