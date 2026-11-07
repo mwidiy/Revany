@@ -88,12 +88,6 @@ export default function SiswaPage() {
       });
   }, [students, searchQuery, jenjangFilter, statusFilter, sortBy]);
 
-  // Stats calculation
-  const totalStudents = students.length;
-  const activeStudents = students.filter(s => s.status === 'aktif').length;
-  const smaUtbkCount = students.filter(s => s.jenjang === 'SMA' || s.jenjang === 'UTBK / Kedinasan').length;
-  const smpSdCount = students.filter(s => s.jenjang === 'SMP' || s.jenjang === 'SD').length;
-
   // Open Add Modal
   const handleOpenAdd = () => {
     setModalMode('add');
@@ -228,70 +222,7 @@ export default function SiswaPage() {
         </div>
       </section>
 
-      {/* 2. Top Stats Overview */}
-      <section className="kpi-grid">
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">Total Siswa</span>
-            <div className="kpi-icon-wrap kpi-icon-indigo" style={{ width: 36, height: 36 }}>
-              <Users size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{totalStudents}</span>
-            <span className="kpi-trend trend-up">Terdaftar</span>
-          </div>
-          <p className="kpi-subtext">Siswa aktif bimbingan terdaftar</p>
-        </div>
-
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">Siswa Aktif</span>
-            <div className="kpi-icon-wrap kpi-icon-emerald" style={{ width: 36, height: 36 }}>
-              <CheckCircle2 size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{activeStudents}</span>
-            <span className="kpi-trend trend-up">Aktif Belajar</span>
-          </div>
-          <p className="kpi-subtext">{totalStudents - activeStudents} Siswa Lulus / Nonaktif</p>
-        </div>
-
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">SMA & UTBK</span>
-            <div className="kpi-icon-wrap kpi-icon-amber" style={{ width: 36, height: 36 }}>
-              <GraduationCap size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{smaUtbkCount}</span>
-            <span className="kpi-trend trend-up">
-              {totalStudents > 0 ? ((smaUtbkCount / totalStudents) * 100).toFixed(0) : 0}% Porsi
-            </span>
-          </div>
-          <p className="kpi-subtext">Siswa tingkat lanjut & intensif ujian</p>
-        </div>
-
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">SMP & SD</span>
-            <div className="kpi-icon-wrap kpi-icon-blue" style={{ width: 36, height: 36 }}>
-              <BookOpen size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{smpSdCount}</span>
-            <span className="kpi-trend trend-up">
-              {totalStudents > 0 ? ((smpSdCount / totalStudents) * 100).toFixed(0) : 0}% Porsi
-            </span>
-          </div>
-          <p className="kpi-subtext">Siswa bimbingan materi reguler dasar</p>
-        </div>
-      </section>
-
-      {/* 3. Action Bar: Search, Filters, Sorting */}
+      {/* 2. Action Bar: Search, Filters, Sorting */}
       <section
         className="card"
         style={{
