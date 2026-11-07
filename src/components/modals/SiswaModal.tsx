@@ -31,7 +31,7 @@ export default function SiswaModal() {
             <div className="kpi-icon-wrap kpi-icon-blue" style={{ width: 36, height: 36 }}>
               <UserPlus size={18} />
             </div>
-            <h3>Tambah Siswa Baru (Supabase)</h3>
+            <h3>Tambah Siswa Baru</h3>
           </div>
           <button className="modal-close-btn" onClick={closeSiswaModal}>
             <X size={20} />

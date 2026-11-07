@@ -29,6 +29,7 @@ export interface Tutor {
   fee_per_jam?: number | null;
   status?: 'aktif' | 'cuti' | 'nonaktif' | string | null;
   badge?: string | null;
+  jenis_kelamin?: 'L' | 'P' | string | null;
   rekening_bank?: string | null;
   created_at?: string | null;
   updated_at?: string | null;

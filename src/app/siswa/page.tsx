@@ -208,24 +208,6 @@ export default function SiswaPage() {
       {/* 1. Hero Header */}
       <section className="hero-banner" style={{ padding: '24px 28px' }}>
         <div className="hero-text">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <span
-              style={{
-                background: 'var(--primary-light)',
-                color: 'var(--primary)',
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 12,
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6
-              }}
-            >
-              <Users size={14} />
-              Database Supabase Live
-            </span>
-          </div>
           <h2>Manajemen Data Siswa</h2>
           <p>Pantau seluruh data siswa les aktif, jenjang sekolah, sisa sesi pertemuan, dan paket belajar.</p>
         </div>
@@ -234,7 +216,7 @@ export default function SiswaPage() {
           <button
             className="btn btn-secondary"
             onClick={() => refreshStudents()}
-            title="Refresh Data dari Supabase"
+            title="Perbarui Data Siswa"
           >
             <RefreshCw size={15} className={isLoadingStudents ? 'animate-spin' : ''} />
             <span>Segarkan</span>
@@ -259,7 +241,7 @@ export default function SiswaPage() {
             <span className="kpi-value" style={{ fontSize: 26 }}>{totalStudents}</span>
             <span className="kpi-trend trend-up">Terdaftar</span>
           </div>
-          <p className="kpi-subtext">Data real-time di PostgreSQL Supabase</p>
+          <p className="kpi-subtext">Siswa aktif bimbingan terdaftar</p>
         </div>
 
         <div className="kpi-card" style={{ padding: '18px 20px' }}>
@@ -382,7 +364,7 @@ export default function SiswaPage() {
         {isLoadingStudents ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
             <RefreshCw size={32} className="animate-spin" style={{ margin: '0 auto 12px', opacity: 0.7 }} />
-            <p style={{ fontWeight: 600 }}>Memuat data siswa dari Supabase...</p>
+            <p style={{ fontWeight: 600 }}>Memuat data siswa...</p>
           </div>
         ) : filteredStudents.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
@@ -741,7 +723,7 @@ export default function SiswaPage() {
                   <Save size={16} />
                   <span>
                     {isSubmitting
-                      ? 'Menyimpan ke Supabase...'
+                      ? 'Menyimpan...'
                       : modalMode === 'add'
                       ? 'Daftarkan Siswa'
                       : 'Perbarui Siswa'}
@@ -776,7 +758,7 @@ export default function SiswaPage() {
                 Hapus Data Siswa?
               </h3>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                Apakah Anda yakin ingin menghapus data <strong>{deleteTarget.nama}</strong> dari database Supabase? Tindakan ini tidak dapat dibatalkan.
+                Apakah Anda yakin ingin menghapus data <strong>{deleteTarget.nama}</strong>? Tindakan ini tidak dapat dibatalkan.
               </p>
             </div>
 

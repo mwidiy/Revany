@@ -7,11 +7,7 @@ import {
   GraduationCap,
   Plus,
   Search,
-  Filter,
-  Star,
   Clock,
-  BookOpen,
-  DollarSign,
   Phone,
   Mail,
   Edit2,
@@ -20,9 +16,95 @@ import {
   CreditCard,
   X,
   Save,
-  CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  User,
+  UserCheck
 } from 'lucide-react';
+
+// ==============================================================================
+// GENDER AVATAR PLACEHOLDER (COWOK / CEWEK)
+// ==============================================================================
+function TutorGenderAvatar({
+  gender,
+  size = 52
+}: {
+  gender?: 'L' | 'P' | string | null;
+  size?: number;
+}) {
+  const isFemale = gender === 'P' || gender === 'Perempuan';
+
+  if (isFemale) {
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: 'var(--radius-full)',
+          background: 'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)',
+          border: '2px solid #f472b6',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#db2777',
+          flexShrink: 0,
+          boxShadow: '0 2px 8px rgba(219, 39, 119, 0.15)'
+        }}
+        title="Tentor Putri (Perempuan)"
+      >
+        <svg
+          width={size * 0.58}
+          height={size * 0.58}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {/* Female Silhouette / Hijab / Soft Hair Contour */}
+          <circle cx="12" cy="7" r="4" />
+          <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+          <path d="M8 8c0 2 1.5 3.5 4 3.5s4-1.5 4-3.5" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 'var(--radius-full)',
+        background: 'linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%)',
+        border: '2px solid #60a5fa',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#2563eb',
+        flexShrink: 0,
+        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.15)'
+      }}
+      title="Tentor Putra (Laki-laki)"
+    >
+      <svg
+        width={size * 0.58}
+        height={size * 0.58}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {/* Male Silhouette with Collar */}
+        <circle cx="12" cy="7" r="4" />
+        <path d="M6 21v-2a6 6 0 0 1 12 0v2" />
+        <path d="M9 13.5l3 3.5 3-3.5" />
+      </svg>
+    </div>
+  );
+}
 
 export default function TentorPage() {
   const { tutors, isLoadingTentors, refreshTentors, addNewTentor, updateTentor, deleteTentor } = useApp();
@@ -30,7 +112,7 @@ export default function TentorPage() {
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'aktif' | 'cuti' | 'nonaktif'>('all');
-  const [sortBy, setSortBy] = useState<'rating' | 'jam' | 'nama'>('rating');
+  const [sortBy, setSortBy] = useState<'nama' | 'jam' | 'fee'>('nama');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,9 +127,8 @@ export default function TentorPage() {
     mapel: '',
     fee_per_jam: 80000,
     status: 'aktif',
-    badge: 'Tutor',
-    rekening_bank: '',
-    avatar: ''
+    jenis_kelamin: 'L' as 'L' | 'P',
+    rekening_bank: ''
   });
 
   // Delete Confirmation Modal State
@@ -67,19 +148,11 @@ export default function TentorPage() {
         return matchesSearch && matchesStatus;
       })
       .sort((a, b) => {
-        if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
         if (sortBy === 'jam') return (b.jam_mengajar || 0) - (a.jam_mengajar || 0);
+        if (sortBy === 'fee') return (b.fee_per_jam || 0) - (a.fee_per_jam || 0);
         return a.nama.localeCompare(b.nama);
       });
   }, [tutors, searchQuery, statusFilter, sortBy]);
-
-  // Stats calculation
-  const totalTentors = tutors.length;
-  const activeTentors = tutors.filter(t => t.status === 'aktif').length;
-  const avgRating = totalTentors > 0
-    ? (tutors.reduce((acc, t) => acc + (t.rating || 5), 0) / totalTentors).toFixed(2)
-    : '5.00';
-  const totalTeachingHours = tutors.reduce((acc, t) => acc + (t.jam_mengajar || 0), 0);
 
   // Open Add Modal
   const handleOpenAdd = () => {
@@ -92,9 +165,8 @@ export default function TentorPage() {
       mapel: '',
       fee_per_jam: 80000,
       status: 'aktif',
-      badge: 'Tutor',
-      rekening_bank: '',
-      avatar: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 1000000)}?w=150&auto=format&fit=crop&q=80`
+      jenis_kelamin: 'L',
+      rekening_bank: ''
     });
     setIsModalOpen(true);
   };
@@ -110,9 +182,8 @@ export default function TentorPage() {
       mapel: tentor.mapel,
       fee_per_jam: tentor.fee_per_jam || 80000,
       status: tentor.status || 'aktif',
-      badge: tentor.badge || 'Tutor',
-      rekening_bank: tentor.rekening_bank || '',
-      avatar: tentor.avatar || ''
+      jenis_kelamin: (tentor.jenis_kelamin === 'P' ? 'P' : 'L') as 'L' | 'P',
+      rekening_bank: tentor.rekening_bank || ''
     });
     setIsModalOpen(true);
   };
@@ -132,12 +203,11 @@ export default function TentorPage() {
           mapel: formData.mapel,
           fee_per_jam: Number(formData.fee_per_jam),
           status: formData.status,
-          badge: formData.badge,
+          jenis_kelamin: formData.jenis_kelamin,
           rekening_bank: formData.rekening_bank,
-          avatar: formData.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+          avatar: null,
           jam_mengajar: 0,
-          total_sesi: 0,
-          rating: 5.0
+          total_sesi: 0
         });
       } else if (selectedTentor) {
         await updateTentor(selectedTentor.id, {
@@ -147,14 +217,13 @@ export default function TentorPage() {
           mapel: formData.mapel,
           fee_per_jam: Number(formData.fee_per_jam),
           status: formData.status,
-          badge: formData.badge,
-          rekening_bank: formData.rekening_bank,
-          avatar: formData.avatar
+          jenis_kelamin: formData.jenis_kelamin,
+          rekening_bank: formData.rekening_bank
         });
       }
       setIsModalOpen(false);
     } catch (err) {
-      // Error handled in context toast
+      // Handled in context toast
     } finally {
       setIsSubmitting(false);
     }
@@ -177,36 +246,18 @@ export default function TentorPage() {
       {/* 1. Header Page */}
       <section className="hero-banner" style={{ padding: '24px 28px' }}>
         <div className="hero-text">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <span
-              style={{
-                background: 'var(--primary-light)',
-                color: 'var(--primary)',
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 12,
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6
-              }}
-            >
-              <GraduationCap size={14} />
-              Database Supabase Live
-            </span>
-          </div>
           <h2>Manajemen Data Tentor</h2>
-          <p>Kelola data profil tenaga pengajar, mata pelajaran yang diampu, jam terbang, dan honor per jam.</p>
+          <p>Kelola data profil tenaga pengajar, penugasan mata pelajaran, jadwal, dan tarif honor per jam.</p>
         </div>
 
         <div className="hero-actions">
           <button
             className="btn btn-secondary"
             onClick={() => refreshTentors()}
-            title="Refresh Data dari Supabase"
+            title="Perbarui Data Pengajar"
           >
             <RefreshCw size={15} className={isLoadingTentors ? 'animate-spin' : ''} />
-            <span>Segarkan</span>
+            <span>Perbarui Data</span>
           </button>
           <button className="btn btn-primary" onClick={handleOpenAdd}>
             <Plus size={16} />
@@ -215,66 +266,7 @@ export default function TentorPage() {
         </div>
       </section>
 
-      {/* 2. Top Stats Overview Grid */}
-      <section className="kpi-grid">
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">Total Tentor</span>
-            <div className="kpi-icon-wrap kpi-icon-indigo" style={{ width: 36, height: 36 }}>
-              <GraduationCap size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{totalTentors}</span>
-            <span className="kpi-trend trend-up">Terdaftar</span>
-          </div>
-          <p className="kpi-subtext">Data tersimpan di PostgreSQL Supabase</p>
-        </div>
-
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">Tentor Aktif</span>
-            <div className="kpi-icon-wrap kpi-icon-emerald" style={{ width: 36, height: 36 }}>
-              <CheckCircle2 size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{activeTentors}</span>
-            <span className="kpi-trend trend-up">Siaga Mengajar</span>
-          </div>
-          <p className="kpi-subtext">{totalTentors - activeTentors} Cuti / Nonaktif</p>
-        </div>
-
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">Rata-rata Rating</span>
-            <div className="kpi-icon-wrap kpi-icon-amber" style={{ width: 36, height: 36 }}>
-              <Star size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>★ {avgRating}</span>
-            <span className="kpi-trend trend-up">Sangat Baik</span>
-          </div>
-          <p className="kpi-subtext">Evaluasi kepuasan siswa & wali</p>
-        </div>
-
-        <div className="kpi-card" style={{ padding: '18px 20px' }}>
-          <div className="kpi-header" style={{ marginBottom: 8 }}>
-            <span className="kpi-title">Total Jam Terbang</span>
-            <div className="kpi-icon-wrap kpi-icon-blue" style={{ width: 36, height: 36 }}>
-              <Clock size={18} />
-            </div>
-          </div>
-          <div className="kpi-value-row">
-            <span className="kpi-value" style={{ fontSize: 26 }}>{totalTeachingHours} Jam</span>
-            <span className="kpi-trend trend-up">Akumulasi</span>
-          </div>
-          <p className="kpi-subtext">Total jam mengajar seluruh tentor</p>
-        </div>
-      </section>
-
-      {/* 3. Action Bar: Search, Filters, Sorting */}
+      {/* 2. Action Bar: Search, Filters, Sorting */}
       <section
         className="card"
         style={{
@@ -338,20 +330,20 @@ export default function TentorPage() {
               onChange={e => setSortBy(e.target.value as any)}
               style={{ width: 'auto', padding: '6px 12px', height: 36, fontSize: 12 }}
             >
-              <option value="rating">Rating Tertinggi</option>
-              <option value="jam">Jam Mengajar Terbanyak</option>
               <option value="nama">Nama (A-Z)</option>
+              <option value="jam">Jam Mengajar Terbanyak</option>
+              <option value="fee">Tarif Fee Tertinggi</option>
             </select>
           </div>
         </div>
       </section>
 
-      {/* 4. Tutors Grid Cards */}
+      {/* 3. Tutors Grid Cards */}
       <section>
         {isLoadingTentors ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
             <RefreshCw size={32} className="animate-spin" style={{ margin: '0 auto 12px', opacity: 0.7 }} />
-            <p style={{ fontWeight: 600 }}>Memuat data tentor dari Supabase...</p>
+            <p style={{ fontWeight: 600 }}>Memuat data pengajar...</p>
           </div>
         ) : filteredTutors.length === 0 ? (
           <div
@@ -381,6 +373,7 @@ export default function TentorPage() {
             {filteredTutors.map(tentor => {
               const isAktif = tentor.status === 'aktif';
               const isCuti = tentor.status === 'cuti';
+              const isFemale = tentor.jenis_kelamin === 'P';
 
               return (
                 <div
@@ -402,23 +395,12 @@ export default function TentorPage() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div style={{ position: 'relative' }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={tentor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                            alt={tentor.nama}
-                            style={{
-                              width: 52,
-                              height: 52,
-                              borderRadius: 'var(--radius-full)',
-                              objectFit: 'cover',
-                              border: '2px solid var(--border-subtle)'
-                            }}
-                          />
+                          <TutorGenderAvatar gender={tentor.jenis_kelamin} size={52} />
                           <span
                             style={{
                               position: 'absolute',
-                              bottom: 2,
-                              right: 2,
+                              bottom: 1,
+                              right: 1,
                               width: 12,
                               height: 12,
                               borderRadius: 'var(--radius-full)',
@@ -437,34 +419,30 @@ export default function TentorPage() {
                             style={{
                               display: 'inline-block',
                               fontSize: 11,
-                              fontWeight: 700,
-                              color: 'var(--primary)',
-                              background: 'var(--primary-light)',
-                              padding: '2px 8px',
-                              borderRadius: 'var(--radius-full)',
-                              marginTop: 4
+                              fontWeight: 600,
+                              color: isFemale ? '#db2777' : 'var(--primary)',
+                              marginTop: 2
                             }}
                           >
-                            {tentor.badge || 'Tutor Revani'}
+                            {isFemale ? 'Tentor Putri' : 'Tentor Putra'}
                           </span>
                         </div>
                       </div>
 
-                      <div style={{ textAlign: 'right' }}>
-                        <div
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            color: 'var(--warning)',
-                            fontWeight: 700,
-                            fontSize: 13
-                          }}
-                        >
-                          <Star size={14} fill="currentColor" />
-                          <span>{tentor.rating || 5.0}</span>
-                        </div>
-                      </div>
+                      {/* Status indicator pill */}
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: '3px 10px',
+                          borderRadius: 'var(--radius-full)',
+                          backgroundColor: isAktif ? 'var(--success-light)' : isCuti ? 'var(--warning-light)' : 'var(--danger-light)',
+                          color: isAktif ? 'var(--success)' : isCuti ? 'var(--warning)' : 'var(--danger)',
+                          textTransform: 'capitalize'
+                        }}
+                      >
+                        {tentor.status || 'aktif'}
+                      </span>
                     </div>
 
                     {/* Mata Pelajaran Tag */}
@@ -561,44 +539,30 @@ export default function TentorPage() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      justifyContent: 'flex-end',
                       borderTop: '1px solid var(--border-subtle)',
                       paddingTop: 12,
-                      marginTop: 4
+                      marginTop: 4,
+                      gap: 8
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: 'var(--radius-full)',
-                        backgroundColor: isAktif ? 'var(--success-light)' : isCuti ? 'var(--warning-light)' : 'var(--danger-light)',
-                        color: isAktif ? 'var(--success)' : isCuti ? 'var(--warning)' : 'var(--danger)'
-                      }}
+                    <button
+                      className="btn btn-secondary"
+                      style={{ padding: '6px 12px', fontSize: 12 }}
+                      onClick={() => handleOpenEdit(tentor)}
+                      title="Edit Data Tentor"
                     >
-                      Status: {tentor.status || 'aktif'}
-                    </span>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <button
-                        className="btn btn-secondary"
-                        style={{ padding: '6px 10px', fontSize: 12 }}
-                        onClick={() => handleOpenEdit(tentor)}
-                        title="Edit Data Tentor"
-                      >
-                        <Edit2 size={13} />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        className="icon-btn"
-                        style={{ width: 32, height: 32, color: 'var(--danger)' }}
-                        onClick={() => setDeleteTarget(tentor)}
-                        title="Hapus Tentor"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                      <Edit2 size={13} />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      className="icon-btn"
+                      style={{ width: 32, height: 32, color: 'var(--danger)' }}
+                      onClick={() => setDeleteTarget(tentor)}
+                      title="Hapus Tentor"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
               );
@@ -608,7 +572,7 @@ export default function TentorPage() {
       </section>
 
       {/* ==============================================================================
-          MODAL: TAMBAH / EDIT TENTOR (SUPABASE LIVE)
+          MODAL: TAMBAH / EDIT TENTOR
           ============================================================================== */}
       {isModalOpen && (
         <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
@@ -618,7 +582,7 @@ export default function TentorPage() {
                 <div className="kpi-icon-wrap kpi-icon-indigo" style={{ width: 36, height: 36 }}>
                   <GraduationCap size={18} />
                 </div>
-                <h3>{modalMode === 'add' ? 'Tambah Tentor Baru' : 'Edit Profil Tentor'}</h3>
+                <h3>{modalMode === 'add' ? 'Tambah Data Tentor' : 'Edit Data Tentor'}</h3>
               </div>
               <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
                 <X size={20} />
@@ -633,9 +597,61 @@ export default function TentorPage() {
                   className="form-input"
                   value={formData.nama}
                   onChange={e => setFormData({ ...formData, nama: e.target.value })}
-                  placeholder="Contoh: Kak Dimas Arya, S.Si"
+                  placeholder="Contoh: Dimas Arya, S.Si"
                   required
                 />
+              </div>
+
+              {/* Jenis Kelamin Selector */}
+              <div className="form-group">
+                <label className="form-label">Jenis Kelamin *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, jenis_kelamin: 'L' })}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: formData.jenis_kelamin === 'L' ? '2px solid var(--primary)' : '1px solid var(--border-subtle)',
+                      backgroundColor: formData.jenis_kelamin === 'L' ? 'var(--primary-light)' : 'var(--bg-surface-secondary)',
+                      color: formData.jenis_kelamin === 'L' ? 'var(--primary)' : 'var(--text-muted)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <User size={16} />
+                    <span>Laki-laki (Putra)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, jenis_kelamin: 'P' })}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: formData.jenis_kelamin === 'P' ? '2px solid #ec4899' : '1px solid var(--border-subtle)',
+                      backgroundColor: formData.jenis_kelamin === 'P' ? 'rgba(236, 72, 153, 0.12)' : 'var(--bg-surface-secondary)',
+                      color: formData.jenis_kelamin === 'P' ? '#db2777' : 'var(--text-muted)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <UserCheck size={16} />
+                    <span>Perempuan (Putri)</span>
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -700,37 +716,15 @@ export default function TentorPage() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Badge Prestasi</label>
+                  <label className="form-label">No. Rekening Bank</label>
                   <input
                     type="text"
                     className="form-input"
-                    value={formData.badge}
-                    onChange={e => setFormData({ ...formData, badge: e.target.value })}
-                    placeholder="Top Performer / Favorite Tutor"
+                    value={formData.rekening_bank}
+                    onChange={e => setFormData({ ...formData, rekening_bank: e.target.value })}
+                    placeholder="BCA 8271928172 a.n Dimas Arya"
                   />
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">No. Rekening Bank (Untuk Pembayaran Fee)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.rekening_bank}
-                  onChange={e => setFormData({ ...formData, rekening_bank: e.target.value })}
-                  placeholder="BCA 8271928172 a.n Dimas Arya"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">URL Foto Profil Avatar</label>
-                <input
-                  type="url"
-                  className="form-input"
-                  value={formData.avatar}
-                  onChange={e => setFormData({ ...formData, avatar: e.target.value })}
-                  placeholder="https://images.unsplash.com/photo-..."
-                />
               </div>
 
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 24 }}>
@@ -744,7 +738,7 @@ export default function TentorPage() {
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                   <Save size={16} />
-                  <span>{isSubmitting ? 'Menyimpan ke Supabase...' : modalMode === 'add' ? 'Simpan Tentor' : 'Perbarui Tentor'}</span>
+                  <span>{isSubmitting ? 'Menyimpan...' : modalMode === 'add' ? 'Simpan Data' : 'Perbarui Data'}</span>
                 </button>
               </div>
             </form>
@@ -775,7 +769,7 @@ export default function TentorPage() {
                 Hapus Data Tentor?
               </h3>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                Apakah Anda yakin ingin menghapus <strong>{deleteTarget.nama}</strong> dari database Supabase? Tindakan ini tidak dapat dibatalkan.
+                Apakah Anda yakin ingin menghapus <strong>{deleteTarget.nama}</strong>? Tindakan ini tidak dapat dibatalkan.
               </p>
             </div>
 

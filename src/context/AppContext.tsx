@@ -115,13 +115,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       }));
     } catch (err: any) {
-      showToast('Gagal memuat data tentor dari Supabase: ' + err.message, 'danger');
+      showToast('Gagal memuat data tentor: ' + err.message, 'danger');
     } finally {
       setIsLoadingTentors(false);
     }
   };
 
-  // Fetch Students from Supabase
+  // Fetch Students
   const refreshStudents = async () => {
     setIsLoadingStudents(true);
     try {
@@ -138,7 +138,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       }));
     } catch (err: any) {
-      showToast('Gagal memuat data siswa dari Supabase: ' + err.message, 'danger');
+      showToast('Gagal memuat data siswa: ' + err.message, 'danger');
     } finally {
       setIsLoadingStudents(false);
     }
@@ -264,7 +264,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ]);
 
       closeSiswaModal();
-      showToast(`Siswa baru ${created.nama} berhasil disimpan ke Supabase! 🎓`, 'success');
+      showToast(`Siswa baru ${created.nama} berhasil ditambahkan! 🎓`, 'success');
       return created;
     } catch (err: any) {
       showToast('Gagal mendaftarkan siswa: ' + err.message, 'danger');
