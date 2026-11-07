@@ -407,18 +407,26 @@ export default function SiswaPage() {
                 >
                   {/* Left: Student Identity */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, minWidth: 260, flex: 1.2 }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={student.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
-                      alt={student.nama}
+                    <div
                       style={{
-                        width: 48,
-                        height: 48,
+                        width: 46,
+                        height: 46,
                         borderRadius: 'var(--radius-full)',
-                        objectFit: 'cover',
-                        border: '2px solid var(--border-subtle)'
+                        background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)',
+                        border: '2px solid #818cf8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#4338ca',
+                        fontWeight: 800,
+                        fontSize: 16,
+                        flexShrink: 0,
+                        boxShadow: '0 2px 6px rgba(99, 102, 241, 0.15)'
                       }}
-                    />
+                      title={student.nama}
+                    >
+                      {student.nama ? student.nama.trim().charAt(0).toUpperCase() : 'S'}
+                    </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)' }}>
