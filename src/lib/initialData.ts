@@ -175,10 +175,11 @@ export const initialTutors: Tutor[] = [
     nama: 'Kak Dimas Arya, S.Si',
     mapel: 'Matematika & Fisika',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    jamMengajar: 48,
+    jam_mengajar: 48,
     rating: 4.98,
-    totalSesi: 32,
-    feeEstimasi: 'Rp 3.840.000',
+    total_sesi: 32,
+    fee_per_jam: 85000,
+    status: 'aktif',
     badge: 'Top Performer'
   },
   {
@@ -186,10 +187,11 @@ export const initialTutors: Tutor[] = [
     nama: 'Kak Sarah Nurul, M.Pd',
     mapel: 'Kimia & Biologi',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
-    jamMengajar: 42,
+    jam_mengajar: 42,
     rating: 4.95,
-    totalSesi: 28,
-    feeEstimasi: 'Rp 3.360.000',
+    total_sesi: 28,
+    fee_per_jam: 80000,
+    status: 'aktif',
     badge: 'Favorite Tutor'
   },
   {
@@ -197,10 +199,11 @@ export const initialTutors: Tutor[] = [
     nama: 'Mr. Kevin Sanjaya, B.Ed',
     mapel: 'English & TOEFL',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
-    jamMengajar: 36,
+    jam_mengajar: 36,
     rating: 4.92,
-    totalSesi: 24,
-    feeEstimasi: 'Rp 3.120.000',
+    total_sesi: 24,
+    fee_per_jam: 85000,
+    status: 'aktif',
     badge: 'Consistent'
   },
   {
@@ -208,10 +211,11 @@ export const initialTutors: Tutor[] = [
     nama: 'Kak Reza Pahlevi, S.Pd',
     mapel: 'IPA & Matematika SMP',
     avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
-    jamMengajar: 30,
+    jam_mengajar: 30,
     rating: 4.88,
-    totalSesi: 20,
-    feeEstimasi: 'Rp 2.400.000',
+    total_sesi: 20,
+    fee_per_jam: 75000,
+    status: 'aktif',
     badge: 'Rising Star'
   }
 ];

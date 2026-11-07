@@ -1,13 +1,18 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { KpiData, ScheduleItem, Tutor, ActivityItem, ToastNotification, Student } from '@/types';
-import { initialKpi, initialSchedules, initialTutors, initialActivities } from '@/lib/initialData';
+import { initialKpi, initialSchedules, initialActivities } from '@/lib/initialData';
+import { tentorService } from '@/services/tentorService';
+import { studentService } from '@/services/studentService';
 
 interface AppContextType {
   kpi: KpiData;
   schedules: ScheduleItem[];
   tutors: Tutor[];
+  students: Student[];
+  isLoadingTentors: boolean;
+  isLoadingStudents: boolean;
   activities: ActivityItem[];
   toasts: ToastNotification[];
   scheduleFilter: 'all' | 'ongoing' | 'upcoming';
@@ -31,10 +36,29 @@ interface AppContextType {
   isMobileSidebarOpen: boolean;
   toggleMobileSidebar: () => void;
   closeMobileSidebar: () => void;
-  // Actions
+  // Live Database Actions for Tentors
+  refreshTentors: () => Promise<void>;
+  addNewTentor: (tentorData: Omit<Tutor, 'id' | 'created_at' | 'updated_at'>) => Promise<Tutor>;
+  updateTentor: (id: string, updates: Partial<Tutor>) => Promise<Tutor>;
+  deleteTentor: (id: string) => Promise<boolean>;
+  // Live Database Actions for Students
+  refreshStudents: () => Promise<void>;
+  addNewStudent: (studentData: {
+    nama: string;
+    jenjang: 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
+    kelas: string;
+    telepon: string;
+    paket: string;
+    sekolah?: string;
+    alamat?: string;
+    catatan?: string;
+  }) => Promise<Student>;
+  updateStudent: (id: string, updates: Partial<Student>) => Promise<Student>;
+  deleteStudent: (id: string) => Promise<boolean>;
+  adjustStudentSessions: (id: string, delta: number) => Promise<Student>;
+  // Other Actions
   recordPresensi: (scheduleId: string, status: string, notes: string) => void;
   addNewSchedule: (scheduleData: { namaSiswa: string; tentor: string; mapel: string; waktu: string; metode: string }) => void;
-  addNewStudent: (studentData: { nama: string; jenjang: string; kelas: string; telepon: string; paket: string }) => void;
   showToast: (message: string, type?: 'success' | 'warning' | 'danger' | 'info') => void;
   removeToast: (id: string) => void;
 }
@@ -44,7 +68,10 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [kpi, setKpi] = useState<KpiData>(initialKpi);
   const [schedules, setSchedules] = useState<ScheduleItem[]>(initialSchedules);
-  const [tutors] = useState<Tutor[]>(initialTutors);
+  const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [isLoadingTentors, setIsLoadingTentors] = useState<boolean>(true);
+  const [isLoadingStudents, setIsLoadingStudents] = useState<boolean>(true);
   const [activities, setActivities] = useState<ActivityItem[]>(initialActivities);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
   const [scheduleFilter, setScheduleFilter] = useState<'all' | 'ongoing' | 'upcoming'>('all');
@@ -72,6 +99,224 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
+  // Fetch Tentors from Supabase
+  const refreshTentors = async () => {
+    setIsLoadingTentors(true);
+    try {
+      const data = await tentorService.getAll();
+      setTutors(data);
+      // Update KPI Tentor Count
+      setKpi(prev => ({
+        ...prev,
+        tentorAktif: {
+          ...prev.tentorAktif,
+          total: data.length,
+          dutyToday: data.filter(t => t.status === 'aktif').length
+        }
+      }));
+    } catch (err: any) {
+      showToast('Gagal memuat data tentor dari Supabase: ' + err.message, 'danger');
+    } finally {
+      setIsLoadingTentors(false);
+    }
+  };
+
+  // Fetch Students from Supabase
+  const refreshStudents = async () => {
+    setIsLoadingStudents(true);
+    try {
+      const data = await studentService.getAll();
+      setStudents(data);
+      // Update KPI Siswa Count
+      setKpi(prev => ({
+        ...prev,
+        siswaAktif: {
+          ...prev.siswaAktif,
+          total: data.length,
+          reguler: data.filter(s => s.paket?.includes('Reguler')).length,
+          intensif: data.filter(s => s.paket?.includes('Intensif') || s.paket?.includes('Eksklusif')).length
+        }
+      }));
+    } catch (err: any) {
+      showToast('Gagal memuat data siswa dari Supabase: ' + err.message, 'danger');
+    } finally {
+      setIsLoadingStudents(false);
+    }
+  };
+
+  // Initial Data Fetch on Mount
+  useEffect(() => {
+    refreshTentors();
+    refreshStudents();
+  }, []);
+
+  // Tentor Actions
+  const addNewTentor = async (data: Omit<Tutor, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const created = await tentorService.create(data);
+      setTutors(prev => [created, ...prev]);
+      setKpi(prev => ({
+        ...prev,
+        tentorAktif: {
+          ...prev.tentorAktif,
+          total: prev.tentorAktif.total + 1
+        }
+      }));
+      setActivities(prev => [
+        {
+          id: `ACT-${Date.now()}`,
+          waktu: 'Baru saja',
+          tipe: 'fee',
+          judul: 'Tentor Baru Ditambahkan',
+          deskripsi: `${created.nama} (${created.mapel}) berhasil didaftarkan ke sistem`,
+          icon: 'UserPlus',
+          color: 'indigo'
+        },
+        ...prev
+      ]);
+      showToast(`Tentor ${created.nama} berhasil ditambahkan ke database! 🎉`, 'success');
+      return created;
+    } catch (err: any) {
+      showToast('Gagal menambahkan tentor: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  const updateTentor = async (id: string, updates: Partial<Tutor>) => {
+    try {
+      const updated = await tentorService.update(id, updates);
+      setTutors(prev => prev.map(t => (t.id === id ? updated : t)));
+      showToast(`Data ${updated.nama} berhasil diperbarui! ✅`, 'success');
+      return updated;
+    } catch (err: any) {
+      showToast('Gagal memperbarui tentor: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  const deleteTentor = async (id: string) => {
+    try {
+      const target = tutors.find(t => t.id === id);
+      await tentorService.delete(id);
+      setTutors(prev => prev.filter(t => t.id !== id));
+      setKpi(prev => ({
+        ...prev,
+        tentorAktif: {
+          ...prev.tentorAktif,
+          total: Math.max(0, prev.tentorAktif.total - 1)
+        }
+      }));
+      showToast(`Tentor ${target?.nama || ''} berhasil dihapus dari database!`, 'info');
+      return true;
+    } catch (err: any) {
+      showToast('Gagal menghapus tentor: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  // Student Actions
+  const addNewStudent = async (data: {
+    nama: string;
+    jenjang: 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
+    kelas: string;
+    telepon: string;
+    paket: string;
+    sekolah?: string;
+    alamat?: string;
+    catatan?: string;
+  }) => {
+    try {
+      const created = await studentService.create({
+        nama: data.nama,
+        jenjang: data.jenjang,
+        kelas: data.kelas,
+        telepon: data.telepon,
+        paket: data.paket,
+        sekolah: data.sekolah || 'Sekolah Terdaftar',
+        alamat: data.alamat || '',
+        catatan: data.catatan || '',
+        avatar: `https://images.unsplash.com/photo-${1535713875002 + Math.floor(Math.random() * 1000)}?w=150&auto=format&fit=crop&q=80`,
+        sisa_sesi: data.paket.includes('16') ? 16 : data.paket.includes('12') ? 12 : 8,
+        total_sesi_paket: data.paket.includes('16') ? 16 : data.paket.includes('12') ? 12 : 8,
+        status: 'aktif'
+      });
+
+      setStudents(prev => [created, ...prev]);
+      setKpi(prev => ({
+        ...prev,
+        siswaAktif: {
+          ...prev.siswaAktif,
+          total: prev.siswaAktif.total + 1
+        }
+      }));
+
+      setActivities(prev => [
+        {
+          id: `ACT-${Date.now()}`,
+          waktu: 'Baru saja',
+          tipe: 'siswa',
+          judul: 'Pendaftaran Siswa Baru',
+          deskripsi: `${created.nama} (${created.jenjang}) terdaftar dalam ${created.paket}`,
+          icon: 'UserPlus',
+          color: 'blue'
+        },
+        ...prev
+      ]);
+
+      closeSiswaModal();
+      showToast(`Siswa baru ${created.nama} berhasil disimpan ke Supabase! 🎓`, 'success');
+      return created;
+    } catch (err: any) {
+      showToast('Gagal mendaftarkan siswa: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  const updateStudent = async (id: string, updates: Partial<Student>) => {
+    try {
+      const updated = await studentService.update(id, updates);
+      setStudents(prev => prev.map(s => (s.id === id ? updated : s)));
+      showToast(`Data siswa ${updated.nama} berhasil diperbarui! ✅`, 'success');
+      return updated;
+    } catch (err: any) {
+      showToast('Gagal memperbarui data siswa: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  const deleteStudent = async (id: string) => {
+    try {
+      const target = students.find(s => s.id === id);
+      await studentService.delete(id);
+      setStudents(prev => prev.filter(s => s.id !== id));
+      setKpi(prev => ({
+        ...prev,
+        siswaAktif: {
+          ...prev.siswaAktif,
+          total: Math.max(0, prev.siswaAktif.total - 1)
+        }
+      }));
+      showToast(`Siswa ${target?.nama || ''} berhasil dihapus dari database!`, 'info');
+      return true;
+    } catch (err: any) {
+      showToast('Gagal menghapus siswa: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  const adjustStudentSessions = async (id: string, delta: number) => {
+    try {
+      const updated = await studentService.adjustSessions(id, delta);
+      setStudents(prev => prev.map(s => (s.id === id ? updated : s)));
+      showToast(`Sisa sesi ${updated.nama}: ${updated.sisa_sesi} pertemuan`, 'success');
+      return updated;
+    } catch (err: any) {
+      showToast('Gagal mengubah sesi siswa: ' + err.message, 'danger');
+      throw err;
+    }
+  };
+
+  // Modals Controller
   const openPresensiModal = (scheduleId?: string) => {
     setPresensiSelectedScheduleId(scheduleId || null);
     setIsPresensiModalOpen(true);
@@ -98,16 +343,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const target = schedules.find(s => s.id === scheduleId);
     const studentName = target ? target.siswa.nama : 'Siswa';
 
-    setSchedules(prev => prev.map(item => {
-      if (item.id === scheduleId) {
-        return {
-          ...item,
-          presensiStatus: status,
-          status: 'completed' as const
-        };
-      }
-      return item;
-    }));
+    setSchedules(prev =>
+      prev.map(item => {
+        if (item.id === scheduleId) {
+          return {
+            ...item,
+            presensiStatus: status,
+            status: 'completed' as const
+          };
+        }
+        return item;
+      })
+    );
 
     setActivities(prev => [
       {
@@ -167,38 +414,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     showToast(`Jadwal les baru untuk ${data.namaSiswa} berhasil dibuat! 📅`, 'success');
   };
 
-  const addNewStudent = (data: { nama: string; jenjang: string; kelas: string; telepon: string; paket: string }) => {
-    setKpi(prev => ({
-      ...prev,
-      siswaAktif: {
-        ...prev.siswaAktif,
-        total: prev.siswaAktif.total + 1
-      }
-    }));
-
-    setActivities(prev => [
-      {
-        id: `ACT-${Date.now()}`,
-        waktu: 'Baru saja',
-        tipe: 'siswa',
-        judul: 'Pendaftaran Siswa Baru',
-        deskripsi: `${data.nama} (${data.jenjang}) terdaftar dalam ${data.paket}`,
-        icon: 'UserPlus',
-        color: 'blue'
-      },
-      ...prev
-    ]);
-
-    closeSiswaModal();
-    showToast(`Siswa baru ${data.nama} berhasil didaftarkan! 🎓`, 'success');
-  };
-
   return (
     <AppContext.Provider
       value={{
         kpi,
         schedules,
         tutors,
+        students,
+        isLoadingTentors,
+        isLoadingStudents,
         activities,
         toasts,
         scheduleFilter,
@@ -221,9 +445,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         isMobileSidebarOpen,
         toggleMobileSidebar,
         closeMobileSidebar,
+        refreshTentors,
+        addNewTentor,
+        updateTentor,
+        deleteTentor,
+        refreshStudents,
+        addNewStudent,
+        updateStudent,
+        deleteStudent,
+        adjustStudentSessions,
         recordPresensi,
         addNewSchedule,
-        addNewStudent,
         showToast,
         removeToast
       }}

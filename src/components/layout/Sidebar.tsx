@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import {
   LayoutDashboard,
@@ -19,7 +20,8 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar() {
-  const { kpi, schedules, isMobileSidebarOpen, closeMobileSidebar } = useApp();
+  const pathname = usePathname();
+  const { tutors, students, schedules, isMobileSidebarOpen, closeMobileSidebar } = useApp();
 
   return (
     <>
@@ -50,7 +52,7 @@ export default function Sidebar() {
 
         <nav className="sidebar-nav">
           <div className="nav-category">Utama</div>
-          <Link href="/" className="nav-item active">
+          <Link href="/" className={`nav-item ${pathname === '/' ? 'active' : ''}`}>
             <LayoutDashboard size={18} />
             <span>Dashboard Overview</span>
           </Link>
@@ -65,16 +67,16 @@ export default function Sidebar() {
           </a>
 
           <div className="nav-category">Akademik & Pengguna</div>
-          <a href="#tentor" className="nav-item">
+          <Link href="/tentor" className={`nav-item ${pathname === '/tentor' ? 'active' : ''}`}>
             <GraduationCap size={18} />
             <span>Data Tentor</span>
-            <span className="nav-badge">{kpi.tentorAktif.total}</span>
-          </a>
-          <a href="#siswa" className="nav-item">
+            <span className="nav-badge">{tutors.length}</span>
+          </Link>
+          <Link href="/siswa" className={`nav-item ${pathname === '/siswa' ? 'active' : ''}`}>
             <Users size={18} />
             <span>Data Siswa</span>
-            <span className="nav-badge">{kpi.siswaAktif.total}</span>
-          </a>
+            <span className="nav-badge">{students.length}</span>
+          </Link>
           <a href="#laporan-belajar" className="nav-item">
             <BookOpenCheck size={18} />
             <span>Laporan Belajar</span>

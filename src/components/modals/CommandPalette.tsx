@@ -10,6 +10,7 @@ export default function CommandPalette() {
     openSearchModal,
     closeSearchModal,
     schedules,
+    students,
     tutors,
     openPresensiModal,
     showToast
@@ -49,13 +50,28 @@ export default function CommandPalette() {
   schedules.forEach(s => {
     if (!q || s.siswa.nama.toLowerCase().includes(q) || s.mapel.toLowerCase().includes(q)) {
       results.push({
-        type: 'Siswa / Sesi Les',
+        type: 'Sesi Hari Ini',
         title: s.siswa.nama,
         subtitle: `${s.mapel} • ${s.waktu}`,
         isTutor: false,
         action: () => {
           closeSearchModal();
           openPresensiModal(s.id);
+        }
+      });
+    }
+  });
+
+  students.forEach(s => {
+    if (!q || s.nama.toLowerCase().includes(q) || (s.sekolah && s.sekolah.toLowerCase().includes(q)) || s.kelas.toLowerCase().includes(q)) {
+      results.push({
+        type: 'Data Siswa',
+        title: s.nama,
+        subtitle: `${s.jenjang} • ${s.kelas} (${s.sekolah || 'Revani'}) • ${s.sisa_sesi ?? 0} Sesi`,
+        isTutor: false,
+        action: () => {
+          closeSearchModal();
+          showToast(`Siswa: ${s.nama} (${s.jenjang} - ${s.kelas})`, 'info');
         }
       });
     }

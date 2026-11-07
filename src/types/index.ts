@@ -1,23 +1,37 @@
 export interface Student {
-  id?: string;
+  id: string;
   nama: string;
-  avatar: string;
+  jenjang: 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
   kelas: string;
-  jenjang?: string;
-  paket?: string;
-  telepon?: string;
+  sekolah?: string | null;
+  telepon: string;
+  alamat?: string | null;
+  avatar?: string | null;
+  paket?: string | null;
+  sisa_sesi?: number | null;
+  total_sesi_paket?: number | null;
+  status?: 'aktif' | 'lulus' | 'nonaktif' | string | null;
+  catatan?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface Tutor {
   id: string;
   nama: string;
+  email?: string | null;
+  telepon?: string | null;
   mapel: string;
-  avatar: string;
-  jamMengajar: number;
-  rating: number;
-  totalSesi: number;
-  feeEstimasi: string;
-  badge: string;
+  avatar?: string | null;
+  jam_mengajar?: number | null;
+  rating?: number | null;
+  total_sesi?: number | null;
+  fee_per_jam?: number | null;
+  status?: 'aktif' | 'cuti' | 'nonaktif' | string | null;
+  badge?: string | null;
+  rekening_bank?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface ScheduleItem {
@@ -25,7 +39,11 @@ export interface ScheduleItem {
   waktu: string;
   mapel: string;
   jenjang: string;
-  siswa: Student;
+  siswa: {
+    nama: string;
+    avatar: string;
+    kelas: string;
+  };
   tentor: {
     nama: string;
     avatar: string;
