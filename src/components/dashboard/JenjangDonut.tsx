@@ -8,11 +8,11 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function JenjangDonut() {
   const data = {
-    labels: ['SMA / SMK', 'SMP', 'SD', 'UTBK / Kedinasan'],
+    labels: ['SMA / SMK', 'SMP', 'SD', 'TK & Prasekolah', 'UTBK'],
     datasets: [
       {
-        data: [42, 28, 18, 12],
-        backgroundColor: ['#6366F1', '#3B82F6', '#10B981', '#F59E0B'],
+        data: [35, 25, 20, 12, 8],
+        backgroundColor: ['#6366F1', '#3B82F6', '#10B981', '#EC4899', '#F59E0B'],
         borderWidth: 0,
         hoverOffset: 6
       }
@@ -40,7 +40,7 @@ export default function JenjangDonut() {
       <div className="card-header">
         <div className="card-title-group">
           <h3>Distribusi Jenjang Siswa</h3>
-          <p>Segmentasi siswa aktif Revani</p>
+          <p>Segmentasi siswa aktif Sahabat Ngajar</p>
         </div>
       </div>
       <div className="donut-wrapper">
@@ -48,16 +48,19 @@ export default function JenjangDonut() {
       </div>
       <div className="donut-legend">
         <div className="legend-item">
-          <span className="legend-color" style={{ background: '#6366F1' }}></span> SMA / SMK (42%)
+          <span className="legend-color" style={{ background: '#6366F1' }}></span> SMA / SMK (35%)
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ background: '#3B82F6' }}></span> SMP (28%)
+          <span className="legend-color" style={{ background: '#3B82F6' }}></span> SMP (25%)
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ background: '#10B981' }}></span> SD (18%)
+          <span className="legend-color" style={{ background: '#10B981' }}></span> SD (20%)
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ background: '#F59E0B' }}></span> UTBK/Kedinasan (12%)
+          <span className="legend-color" style={{ background: '#EC4899' }}></span> TK & Prasekolah (12%)
+        </div>
+        <div className="legend-item">
+          <span className="legend-color" style={{ background: '#F59E0B' }}></span> UTBK (8%)
         </div>
       </div>
     </div>

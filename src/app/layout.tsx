@@ -11,8 +11,12 @@ import CommandPalette from '@/components/modals/CommandPalette';
 import ToastContainer from '@/components/ui/ToastContainer';
 
 export const metadata: Metadata = {
-  title: 'Revani Edu — Dashboard Overview Manajemen Les & Bimbel',
-  description: 'Sistem manajemen bimbingan belajar dan les privat modern, presensi otomatis, jadwal interaktif, dan rekap fee tentor.',
+  title: 'Sahabat Ngajar — Manajemen Bimbingan & Pendamping Belajar',
+  description: 'Sistem manajemen bimbingan belajar dan les privat modern Sahabat Ngajar, presensi otomatis, jadwal interaktif, dan rekap pertemuan.',
+  icons: {
+    icon: '/logo.jpeg',
+    apple: '/logo.jpeg'
+  }
 };
 
 export default function RootLayout({

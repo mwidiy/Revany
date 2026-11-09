@@ -45,10 +45,13 @@ interface AppContextType {
   refreshStudents: () => Promise<void>;
   addNewStudent: (studentData: {
     nama: string;
-    jenjang: 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
+    jenjang: 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
     kelas: string;
     telepon: string;
     paket: string;
+    biaya?: number;
+    sisa_sesi?: number;
+    total_sesi_paket?: number;
     sekolah?: string;
     alamat?: string;
     catatan?: string;
@@ -217,27 +220,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Student Actions
   const addNewStudent = async (data: {
     nama: string;
-    jenjang: 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
+    jenjang: 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
     kelas: string;
     telepon: string;
     paket: string;
+    biaya?: number;
+    sisa_sesi?: number;
+    total_sesi_paket?: number;
     sekolah?: string;
     alamat?: string;
     catatan?: string;
   }) => {
     try {
+      const sisa = data.sisa_sesi ?? 8;
+      const total = data.total_sesi_paket ?? sisa;
       const created = await studentService.create({
         nama: data.nama,
         jenjang: data.jenjang,
         kelas: data.kelas,
         telepon: data.telepon,
         paket: data.paket,
-        sekolah: data.sekolah || 'Sekolah Terdaftar',
+        biaya: data.biaya ?? 0,
+        sekolah: data.sekolah || '',
         alamat: data.alamat || '',
         catatan: data.catatan || '',
-        avatar: `https://images.unsplash.com/photo-${1535713875002 + Math.floor(Math.random() * 1000)}?w=150&auto=format&fit=crop&q=80`,
-        sisa_sesi: data.paket.includes('16') ? 16 : data.paket.includes('12') ? 12 : 8,
-        total_sesi_paket: data.paket.includes('16') ? 16 : data.paket.includes('12') ? 12 : 8,
+        avatar: null,
+        sisa_sesi: sisa,
+        total_sesi_paket: total,
         status: 'aktif'
       });
 

@@ -50,12 +50,13 @@ export default function SiswaPage() {
   // Form State
   const [formData, setFormData] = useState({
     nama: '',
-    jenjang: 'SMA' as 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan',
+    jenjang: 'SD' as 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan',
     kelas: '',
     sekolah: '',
     telepon: '',
     alamat: '',
-    paket: 'Reguler (8 Sesi / Bulan)',
+    paket: '',
+    biaya: 750000,
     sisa_sesi: 8,
     total_sesi_paket: 8,
     status: 'aktif',
@@ -94,17 +95,18 @@ export default function SiswaPage() {
     setSelectedStudent(null);
     setFormData({
       nama: '',
-      jenjang: 'SMA',
+      jenjang: 'SD',
       kelas: '',
       sekolah: '',
       telepon: '',
       alamat: '',
-      paket: 'Reguler (8 Sesi / Bulan)',
+      paket: '',
+      biaya: 750000,
       sisa_sesi: 8,
       total_sesi_paket: 8,
       status: 'aktif',
       catatan: '',
-      avatar: `https://images.unsplash.com/photo-${1535713875002 + Math.floor(Math.random() * 1000)}?w=150&auto=format&fit=crop&q=80`
+      avatar: ''
     });
     setIsModalOpen(true);
   };
@@ -120,7 +122,8 @@ export default function SiswaPage() {
       sekolah: student.sekolah || '',
       telepon: student.telepon,
       alamat: student.alamat || '',
-      paket: student.paket || 'Reguler (8 Sesi / Bulan)',
+      paket: student.paket || '',
+      biaya: student.biaya ?? 750000,
       sisa_sesi: student.sisa_sesi || 8,
       total_sesi_paket: student.total_sesi_paket || 8,
       status: student.status || 'aktif',
@@ -143,7 +146,10 @@ export default function SiswaPage() {
           jenjang: formData.jenjang,
           kelas: formData.kelas,
           telepon: formData.telepon,
-          paket: formData.paket,
+          paket: formData.paket || 'Reguler',
+          biaya: Number(formData.biaya || 0),
+          sisa_sesi: Number(formData.sisa_sesi || 8),
+          total_sesi_paket: Number(formData.total_sesi_paket || 8),
           sekolah: formData.sekolah,
           alamat: formData.alamat,
           catatan: formData.catatan
@@ -157,6 +163,7 @@ export default function SiswaPage() {
           telepon: formData.telepon,
           alamat: formData.alamat,
           paket: formData.paket,
+          biaya: Number(formData.biaya || 0),
           sisa_sesi: Number(formData.sisa_sesi),
           total_sesi_paket: Number(formData.total_sesi_paket),
           status: formData.status,
@@ -184,6 +191,10 @@ export default function SiswaPage() {
 
   const getJenjangBadgeColor = (jenjang: string) => {
     switch (jenjang) {
+      case 'TK':
+        return { bg: 'rgba(236, 72, 153, 0.12)', color: '#db2777' };
+      case 'Prasekolah':
+        return { bg: 'rgba(168, 85, 247, 0.12)', color: '#9333ea' };
       case 'SD':
         return { bg: 'var(--success-light)', color: 'var(--success)' };
       case 'SMP':
@@ -252,7 +263,7 @@ export default function SiswaPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           {/* Jenjang Filter */}
           <div className="filter-pills">
-            {['all', 'SD', 'SMP', 'SMA', 'UTBK / Kedinasan'].map(j => (
+            {['all', 'TK', 'Prasekolah', 'SD', 'SMP', 'SMA', 'UTBK / Kedinasan'].map(j => (
               <button
                 key={j}
                 className={`filter-btn ${jenjangFilter === j ? 'active' : ''}`}
@@ -462,7 +473,15 @@ export default function SiswaPage() {
                     </div>
                   </div>
 
-                  {/* Mid 2: Target / Catatan & Kontak WA */}
+                  {/* Mid 2: Biaya / Fee Siswa */}
+                  <div style={{ minWidth: 140 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                      Biaya Les
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--primary)', marginTop: 2 }}>
+                      Rp {Number(student.biaya || 0).toLocaleString('id-ID')}
+                    </div>
+                  </div>
                   <div style={{ minWidth: 200, flex: 1, fontSize: 12 }}>
                     <a
                       href={`https://wa.me/${student.telepon.replace(/[^0-9]/g, '')}`}
@@ -554,6 +573,8 @@ export default function SiswaPage() {
                     onChange={e => setFormData({ ...formData, jenjang: e.target.value as any })}
                     required
                   >
+                    <option value="TK">TK</option>
+                    <option value="Prasekolah">Prasekolah</option>
                     <option value="SD">SD</option>
                     <option value="SMP">SMP</option>
                     <option value="SMA">SMA</option>
@@ -567,7 +588,7 @@ export default function SiswaPage() {
                     className="form-input"
                     value={formData.kelas}
                     onChange={e => setFormData({ ...formData, kelas: e.target.value })}
-                    placeholder="Contoh: XII MIPA 1 / VIII-B"
+                    placeholder="Contoh: TK-B / SD 3 / XII MIPA"
                     required
                   />
                 </div>
@@ -581,7 +602,7 @@ export default function SiswaPage() {
                     className="form-input"
                     value={formData.sekolah}
                     onChange={e => setFormData({ ...formData, sekolah: e.target.value })}
-                    placeholder="Contoh: SMAN 28 Jakarta"
+                    placeholder="Contoh: TK Al-Azhar / SMAN 28"
                   />
                 </div>
                 <div className="form-group">
@@ -597,22 +618,30 @@ export default function SiswaPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 12 }}>
+              <div className="form-group">
+                <label className="form-label">Paket Les (Input Bebas / Manual) *</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={formData.paket}
+                  onChange={e => setFormData({ ...formData, paket: e.target.value })}
+                  placeholder="Contoh: Paket Calistung 8 Sesi, Reguler 12 Sesi, Privat Khusus UN"
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 12 }}>
                 <div className="form-group">
-                  <label className="form-label">Paket Les</label>
-                  <select
-                    className="form-select"
-                    value={formData.paket}
-                    onChange={e => {
-                      const p = e.target.value;
-                      const s = p.includes('16') ? 16 : p.includes('12') ? 12 : 8;
-                      setFormData({ ...formData, paket: p, sisa_sesi: s, total_sesi_paket: s });
-                    }}
-                  >
-                    <option value="Reguler (8 Sesi / Bulan)">Reguler (8 Sesi / Bulan)</option>
-                    <option value="Intensif 12 Sesi / Bulan">Intensif (12 Sesi / Bulan)</option>
-                    <option value="Privat Eksklusif (16 Sesi)">Privat Eksklusif (16 Sesi)</option>
-                  </select>
+                  <label className="form-label">Biaya / Fee Siswa (Rp) *</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={formData.biaya}
+                    onChange={e => setFormData({ ...formData, biaya: Number(e.target.value) })}
+                    placeholder="Contoh: 750000"
+                    step="10000"
+                    required
+                  />
                 </div>
 
                 <div className="form-group">
@@ -621,7 +650,14 @@ export default function SiswaPage() {
                     type="number"
                     className="form-input"
                     value={formData.sisa_sesi}
-                    onChange={e => setFormData({ ...formData, sisa_sesi: Number(e.target.value) })}
+                    onChange={e => {
+                      const val = Number(e.target.value);
+                      setFormData({
+                        ...formData,
+                        sisa_sesi: val,
+                        total_sesi_paket: Math.max(val, formData.total_sesi_paket)
+                      });
+                    }}
                     min="0"
                   />
                 </div>

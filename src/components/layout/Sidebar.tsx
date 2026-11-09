@@ -41,11 +41,23 @@ export default function Sidebar() {
 
       <aside className={`sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
-          <Link href="/" className="brand-wrapper">
-            <div className="brand-icon">R</div>
+          <Link href="/" className="brand-wrapper" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.jpeg"
+              alt="Sahabat Ngajar"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 'var(--radius-full)',
+                objectFit: 'cover',
+                border: '2px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)'
+              }}
+            />
             <div className="brand-text">
-              <h1>Revani Edu</h1>
-              <span>Bimbel & Les Privat</span>
+              <h1 style={{ fontSize: 16, fontWeight: 800 }}>Sahabat Ngajar</h1>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Bimbel & Pendamping Belajar</span>
             </div>
           </Link>
         </div>

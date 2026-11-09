@@ -7,20 +7,30 @@ import { UserPlus, X, Check } from 'lucide-react';
 export default function SiswaModal() {
   const { isSiswaModalOpen, closeSiswaModal, addNewStudent } = useApp();
   const [nama, setNama] = useState('');
-  const [jenjang, setJenjang] = useState<'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan'>('SMA');
+  const [jenjang, setJenjang] = useState<'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan'>('SD');
   const [kelas, setKelas] = useState('');
   const [telepon, setTelepon] = useState('');
-  const [paket, setPaket] = useState('Reguler (8 Sesi / Bulan)');
+  const [paket, setPaket] = useState('');
+  const [biaya, setBiaya] = useState<number>(750000);
 
   if (!isSiswaModalOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nama || !kelas || !telepon) return;
-    await addNewStudent({ nama, jenjang, kelas, telepon, paket });
+    await addNewStudent({
+      nama,
+      jenjang,
+      kelas,
+      telepon,
+      paket: paket || 'Reguler',
+      biaya: Number(biaya || 0)
+    });
     setNama('');
     setKelas('');
     setTelepon('');
+    setPaket('');
+    setBiaya(750000);
   };
 
   return (
@@ -60,6 +70,8 @@ export default function SiswaModal() {
                 onChange={e => setJenjang(e.target.value as any)}
                 required
               >
+                <option value="TK">TK</option>
+                <option value="Prasekolah">Prasekolah</option>
                 <option value="SD">SD</option>
                 <option value="SMP">SMP</option>
                 <option value="SMA">SMA</option>
@@ -73,7 +85,7 @@ export default function SiswaModal() {
                 className="form-input"
                 value={kelas}
                 onChange={e => setKelas(e.target.value)}
-                placeholder="Contoh: XII MIPA 1"
+                placeholder="Contoh: TK-B / SD 2 / XII MIPA"
                 required
               />
             </div>
@@ -91,17 +103,30 @@ export default function SiswaModal() {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Paket Les</label>
-            <select
-              className="form-select"
-              value={paket}
-              onChange={e => setPaket(e.target.value)}
-            >
-              <option value="Reguler (8 Sesi / Bulan)">Reguler (8 Sesi / Bulan)</option>
-              <option value="Intensif 12 Sesi / Bulan">Intensif (12 Sesi / Bulan)</option>
-              <option value="Privat Eksklusif (16 Sesi)">Privat Eksklusif (16 Sesi)</option>
-            </select>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 12 }}>
+            <div className="form-group">
+              <label className="form-label">Paket Les (Input Manual) *</label>
+              <input
+                type="text"
+                className="form-input"
+                value={paket}
+                onChange={e => setPaket(e.target.value)}
+                placeholder="Contoh: Calistung 8 Sesi / Reguler"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Biaya / Fee Siswa (Rp) *</label>
+              <input
+                type="number"
+                className="form-input"
+                value={biaya}
+                onChange={e => setBiaya(Number(e.target.value))}
+                placeholder="750000"
+                step="10000"
+                required
+              />
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 24 }}>
@@ -110,7 +135,7 @@ export default function SiswaModal() {
             </button>
             <button type="submit" className="btn btn-primary">
               <Check size={16} />
-              <span>Daftarkan ke Database</span>
+              <span>Daftarkan Siswa</span>
             </button>
           </div>
         </form>

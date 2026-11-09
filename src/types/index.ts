@@ -1,13 +1,14 @@
 export interface Student {
   id: string;
   nama: string;
-  jenjang: 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
+  jenjang: 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
   kelas: string;
   sekolah?: string | null;
   telepon: string;
   alamat?: string | null;
   avatar?: string | null;
   paket?: string | null;
+  biaya?: number | null;
   sisa_sesi?: number | null;
   total_sesi_paket?: number | null;
   status?: 'aktif' | 'lulus' | 'nonaktif' | string | null;

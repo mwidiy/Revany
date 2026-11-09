@@ -92,7 +92,7 @@ export default function Topbar() {
         {/* Support Help Button (hidden on small mobile) */}
         <button
           className="icon-btn topbar-help-btn"
-          onClick={() => showToast('Pusat Bantuan Revani Edu siap membantu!', 'info')}
+          onClick={() => showToast('Pusat Bantuan Sahabat Ngajar siap membantu!', 'info')}
           title="Pusat Bantuan"
           aria-label="Bantuan"
         >

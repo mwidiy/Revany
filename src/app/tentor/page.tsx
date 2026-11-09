@@ -112,7 +112,7 @@ export default function TentorPage() {
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'aktif' | 'cuti' | 'nonaktif'>('all');
-  const [sortBy, setSortBy] = useState<'nama' | 'jam' | 'fee'>('nama');
+  const [sortBy, setSortBy] = useState<'nama' | 'jam'>('nama');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,7 +125,6 @@ export default function TentorPage() {
     email: '',
     telepon: '',
     mapel: '',
-    fee_per_jam: 80000,
     status: 'aktif',
     jenis_kelamin: 'L' as 'L' | 'P',
     rekening_bank: ''
@@ -149,7 +148,6 @@ export default function TentorPage() {
       })
       .sort((a, b) => {
         if (sortBy === 'jam') return (b.jam_mengajar || 0) - (a.jam_mengajar || 0);
-        if (sortBy === 'fee') return (b.fee_per_jam || 0) - (a.fee_per_jam || 0);
         return a.nama.localeCompare(b.nama);
       });
   }, [tutors, searchQuery, statusFilter, sortBy]);
@@ -163,7 +161,6 @@ export default function TentorPage() {
       email: '',
       telepon: '',
       mapel: '',
-      fee_per_jam: 80000,
       status: 'aktif',
       jenis_kelamin: 'L',
       rekening_bank: ''
@@ -180,7 +177,6 @@ export default function TentorPage() {
       email: tentor.email || '',
       telepon: tentor.telepon || '',
       mapel: tentor.mapel,
-      fee_per_jam: tentor.fee_per_jam || 80000,
       status: tentor.status || 'aktif',
       jenis_kelamin: (tentor.jenis_kelamin === 'P' ? 'P' : 'L') as 'L' | 'P',
       rekening_bank: tentor.rekening_bank || ''
@@ -201,7 +197,6 @@ export default function TentorPage() {
           email: formData.email,
           telepon: formData.telepon,
           mapel: formData.mapel,
-          fee_per_jam: Number(formData.fee_per_jam),
           status: formData.status,
           jenis_kelamin: formData.jenis_kelamin,
           rekening_bank: formData.rekening_bank,
@@ -215,7 +210,6 @@ export default function TentorPage() {
           email: formData.email,
           telepon: formData.telepon,
           mapel: formData.mapel,
-          fee_per_jam: Number(formData.fee_per_jam),
           status: formData.status,
           jenis_kelamin: formData.jenis_kelamin,
           rekening_bank: formData.rekening_bank
@@ -332,7 +326,6 @@ export default function TentorPage() {
             >
               <option value="nama">Nama (A-Z)</option>
               <option value="jam">Jam Mengajar Terbanyak</option>
-              <option value="fee">Tarif Fee Tertinggi</option>
             </select>
           </div>
         </div>
@@ -466,14 +459,14 @@ export default function TentorPage() {
                     </div>
                   </div>
 
-                  {/* Body Metrics: Jam, Sesi, Tarif */}
+                  {/* Body Metrics: Jam & Sesi */}
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: 8,
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: 10,
                       background: 'var(--bg-surface-secondary)',
-                      padding: '12px 10px',
+                      padding: '12px 14px',
                       borderRadius: 'var(--radius-md)',
                       textAlign: 'center'
                     }}
@@ -482,7 +475,7 @@ export default function TentorPage() {
                       <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                         Jam Ajar
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', marginTop: 2 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', marginTop: 2 }}>
                         {tentor.jam_mengajar || 0} Jam
                       </div>
                     </div>
@@ -490,16 +483,8 @@ export default function TentorPage() {
                       <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                         Total Sesi
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', marginTop: 2 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', marginTop: 2 }}>
                         {tentor.total_sesi || 0} Sesi
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
-                        Fee / Jam
-                      </div>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--primary)', marginTop: 2 }}>
-                        Rp {((tentor.fee_per_jam || 80000) / 1000).toFixed(0)}k
                       </div>
                     </div>
                   </div>
@@ -654,29 +639,16 @@ export default function TentorPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div className="form-group">
-                  <label className="form-label">Mata Pelajaran Diampu *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.mapel}
-                    onChange={e => setFormData({ ...formData, mapel: e.target.value })}
-                    placeholder="Matematika & Fisika SMA"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Tarif Fee per Jam (Rp)</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    value={formData.fee_per_jam}
-                    onChange={e => setFormData({ ...formData, fee_per_jam: Number(e.target.value) })}
-                    placeholder="85000"
-                    step="5000"
-                  />
-                </div>
+              <div className="form-group">
+                <label className="form-label">Mata Pelajaran Diampu *</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={formData.mapel}
+                  onChange={e => setFormData({ ...formData, mapel: e.target.value })}
+                  placeholder="Contoh: Matematika & Fisika SMA, Calistung TK"
+                  required
+                />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -697,7 +669,7 @@ export default function TentorPage() {
                     className="form-input"
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="nama@revani.edu"
+                    placeholder="nama@sahabatngajar.com"
                   />
                 </div>
               </div>

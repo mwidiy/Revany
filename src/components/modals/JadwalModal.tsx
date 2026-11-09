@@ -99,8 +99,8 @@ export default function JadwalModal() {
               onChange={e => setMetode(e.target.value)}
             >
               <option value="Offline (Rumah Siswa)">Offline (Rumah Siswa)</option>
-              <option value="Offline (Revani Hub)">Offline (Revani Hub)</option>
-              <option value="Online (Zoom Revani)">Online (Zoom Revani)</option>
+              <option value="Offline (Learning Hub)">Offline (Learning Hub)</option>
+              <option value="Online (Zoom Sahabat Ngajar)">Online (Zoom Sahabat Ngajar)</option>
               <option value="Online (Google Meet)">Online (Google Meet)</option>
             </select>
           </div>
