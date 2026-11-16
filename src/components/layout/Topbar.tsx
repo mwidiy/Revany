@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { useTheme } from '@/context/ThemeContext';
+import Link from 'next/link';
 import { Menu, Search, Moon, Sun, Bell, HelpCircle } from 'lucide-react';
 
 export default function Topbar() {
@@ -44,11 +45,16 @@ export default function Topbar() {
           <Menu size={18} />
         </button>
 
-        <div className="live-indicator" title={`${ongoingCount} Sesi Les Sedang Berlangsung`}>
+        <Link
+          href="/absensi"
+          className="live-indicator"
+          style={{ textDecoration: 'none', cursor: 'pointer' }}
+          title={`${ongoingCount} Sesi Les Sedang Berlangsung. Klik untuk Mode Absensi.`}
+        >
           <span className="pulse-dot"></span>
-          <span className="live-text-full">{ongoingCount} Sesi Sedang Berlangsung</span>
+          <span className="live-text-full">{ongoingCount} Sesi Berlangsung • Mode Absensi</span>
           <span className="live-text-short">{ongoingCount} Live</span>
-        </div>
+        </Link>
 
         <div className="topbar-datetime">
           {dateTimeString}

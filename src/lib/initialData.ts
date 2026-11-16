@@ -41,12 +41,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'SMA Kelas 12',
     siswa: {
       nama: 'Farhan Pratama',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'XII MIPA 1'
     },
     tentor: {
       nama: 'Kak Dimas Arya, S.Si',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Offline (Rumah Siswa)',
     status: 'ongoing',
@@ -60,12 +60,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'SMA Kelas 12',
     siswa: {
       nama: 'Alya Putri Ramadhani',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'XII MIPA 3'
     },
     tentor: {
       nama: 'Kak Sarah Nurul, M.Pd',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Online (Zoom Revani #2)',
     status: 'ongoing',
@@ -79,12 +79,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'Alumni / Kedinasan',
     siswa: {
       nama: 'Bintang Kusuma',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'Persiapan Akpol'
     },
     tentor: {
       nama: 'Mr. Kevin Sanjaya, B.Ed',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Offline (Ruang Diskusi Revani)',
     status: 'ongoing',
@@ -98,12 +98,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'SMP Kelas 8',
     siswa: {
       nama: 'Nayla Zahra Putri',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'VIII-B'
     },
     tentor: {
       nama: 'Kak Reza Pahlevi, S.Pd',
-      avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Offline (Rumah Siswa)',
     status: 'ongoing',
@@ -117,12 +117,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'SMA Kelas 11',
     siswa: {
       nama: 'Syifa Azzahra',
-      avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'XI MIPA 2'
     },
     tentor: {
       nama: 'Kak Sarah Nurul, M.Pd',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Online (Google Meet)',
     status: 'upcoming',
@@ -136,12 +136,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'Intensif UTBK 2026',
     siswa: {
       nama: 'Rizky Dwi Ananda',
-      avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'Alumni SMA 28'
     },
     tentor: {
       nama: 'Kak Dimas Arya, S.Si',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Offline (Revani Classroom A)',
     status: 'upcoming',
@@ -155,12 +155,12 @@ export const initialSchedules: ScheduleItem[] = [
     jenjang: 'SD Kelas 3',
     siswa: {
       nama: 'Alvaro Kenzo',
-      avatar: 'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=100&auto=format&fit=crop&q=80',
+      avatar: '',
       kelas: 'III-A'
     },
     tentor: {
       nama: 'Kak Nadia Safitri, S.Psi',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
+      avatar: ''
     },
     metode: 'Offline (Rumah Siswa)',
     status: 'completed',
@@ -174,7 +174,7 @@ export const initialTutors: Tutor[] = [
     id: 'TNT-01',
     nama: 'Kak Dimas Arya, S.Si',
     mapel: 'Matematika & Fisika',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    avatar: null,
     jam_mengajar: 48,
     rating: 4.98,
     total_sesi: 32,
@@ -186,7 +186,7 @@ export const initialTutors: Tutor[] = [
     id: 'TNT-02',
     nama: 'Kak Sarah Nurul, M.Pd',
     mapel: 'Kimia & Biologi',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
+    avatar: null,
     jam_mengajar: 42,
     rating: 4.95,
     total_sesi: 28,
@@ -198,7 +198,7 @@ export const initialTutors: Tutor[] = [
     id: 'TNT-03',
     nama: 'Mr. Kevin Sanjaya, B.Ed',
     mapel: 'English & TOEFL',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
+    avatar: null,
     jam_mengajar: 36,
     rating: 4.92,
     total_sesi: 24,
@@ -210,7 +210,7 @@ export const initialTutors: Tutor[] = [
     id: 'TNT-04',
     nama: 'Kak Reza Pahlevi, S.Pd',
     mapel: 'IPA & Matematika SMP',
-    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
+    avatar: null,
     jam_mengajar: 30,
     rating: 4.88,
     total_sesi: 20,

@@ -1,6 +1,8 @@
 export interface Student {
   id: string;
   nama: string;
+  email?: string | null;
+  password?: string | null;
   jenjang: 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
   kelas: string;
   sekolah?: string | null;
@@ -21,6 +23,7 @@ export interface Tutor {
   id: string;
   nama: string;
   email?: string | null;
+  password?: string | null;
   telepon?: string | null;
   mapel: string;
   avatar?: string | null;
@@ -103,4 +106,60 @@ export interface ToastNotification {
   id: string;
   message: string;
   type: 'success' | 'warning' | 'danger' | 'info';
+}
+
+export interface AttendanceSession {
+  id: string;
+  tentor_id?: string | null;
+  mapel: string;
+  judul_sesi?: string | null;
+  kode_unik: string;
+  tanggal?: string | null;
+  status: 'aktif' | 'ditutup';
+  waktu_mulai?: string | null;
+  waktu_selesai?: string | null;
+  catatan?: string | null;
+  created_at?: string | null;
+  tentor?: Tutor;
+  records?: AttendanceRecord[];
+}
+
+export interface AttendanceRecord {
+  id: string;
+  session_id: string;
+  student_id: string;
+  kode_digunakan: string;
+  waktu_absen: string;
+  status: 'hadir' | 'izin' | 'sakit' | 'alpha';
+  catatan?: string | null;
+  created_at?: string | null;
+  student?: Student;
+}
+
+export interface LearningMaterial {
+  id: string;
+  tentor_id?: string | null;
+  judul: string;
+  mapel: string;
+  jenjang: string;
+  deskripsi?: string | null;
+  file_url?: string | null;
+  tipe_file: 'pdf' | 'video' | 'doc' | 'link';
+  created_at?: string | null;
+  tentor?: Tutor;
+}
+
+export interface LearningSchedule {
+  id: string;
+  tentor_id?: string | null;
+  student_id?: string | null;
+  hari: string;
+  jam_mulai: string;
+  jam_selesai: string;
+  mapel: string;
+  metode: 'Offline' | 'Online' | 'Hybrid';
+  ruangan?: string;
+  status?: string;
+  tentor?: Tutor;
+  student?: Student;
 }

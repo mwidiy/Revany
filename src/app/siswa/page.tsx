@@ -22,7 +22,8 @@ import {
   MinusCircle,
   X,
   Save,
-  BookOpen
+  BookOpen,
+  Zap
 } from 'lucide-react';
 
 export default function SiswaPage() {
@@ -50,6 +51,8 @@ export default function SiswaPage() {
   // Form State
   const [formData, setFormData] = useState({
     nama: '',
+    email: '',
+    password: '',
     jenjang: 'SD' as 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan',
     kelas: '',
     sekolah: '',
@@ -77,6 +80,7 @@ export default function SiswaPage() {
           s.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
           s.kelas.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (s.sekolah && s.sekolah.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (s.email && s.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
           s.telepon.includes(searchQuery);
         const matchesJenjang = jenjangFilter === 'all' || s.jenjang === jenjangFilter;
         const matchesStatus = statusFilter === 'all' || s.status === statusFilter;
@@ -95,6 +99,8 @@ export default function SiswaPage() {
     setSelectedStudent(null);
     setFormData({
       nama: '',
+      email: '',
+      password: '',
       jenjang: 'SD',
       kelas: '',
       sekolah: '',
@@ -117,6 +123,8 @@ export default function SiswaPage() {
     setSelectedStudent(student);
     setFormData({
       nama: student.nama,
+      email: student.email || '',
+      password: student.password || '',
       jenjang: student.jenjang,
       kelas: student.kelas,
       sekolah: student.sekolah || '',
@@ -143,6 +151,8 @@ export default function SiswaPage() {
       if (modalMode === 'add') {
         await addNewStudent({
           nama: formData.nama,
+          email: formData.email || undefined,
+          password: formData.password || '123456',
           jenjang: formData.jenjang,
           kelas: formData.kelas,
           telepon: formData.telepon,
@@ -157,6 +167,8 @@ export default function SiswaPage() {
       } else if (selectedStudent) {
         await updateStudent(selectedStudent.id, {
           nama: formData.nama,
+          email: formData.email || null,
+          ...(formData.password ? { password: formData.password } : {}),
           jenjang: formData.jenjang,
           kelas: formData.kelas,
           sekolah: formData.sekolah,
@@ -327,8 +339,9 @@ export default function SiswaPage() {
             {filteredStudents.map(student => {
               const badgeStyle = getJenjangBadgeColor(student.jenjang);
               const sisa = student.sisa_sesi ?? 0;
-              const total = student.total_sesi_paket ?? 8;
-              const percent = Math.min(100, Math.round((sisa / total) * 100));
+              const total = student.total_sesi_paket || 8;
+              const pertemuanSelesai = Math.max(0, total - sisa);
+              const percent = Math.min(100, Math.round((pertemuanSelesai / total) * 100));
               const isLowSessions = sisa <= 2;
 
               return (
@@ -395,27 +408,41 @@ export default function SiswaPage() {
                     </div>
                   </div>
 
-                  {/* Mid 1: Package & Session Progress */}
-                  <div style={{ minWidth: 200, flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  {/* Mid 1: Package & Session Progress (Sinkron dengan Absensi) */}
+                  <div style={{ minWidth: 230, flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                       <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>
-                        {student.paket}
+                        {student.paket || 'Paket Les'}
                       </span>
                       <span
                         style={{
-                          fontSize: 12,
+                          fontSize: 12.5,
                           fontWeight: 800,
-                          color: isLowSessions ? 'var(--danger)' : 'var(--primary)'
+                          color: 'var(--primary)'
                         }}
                       >
-                        {sisa} / {total} Sesi
+                        Pertemuan {pertemuanSelesai} / {total} Sesi
                       </span>
                     </div>
 
-                    {/* Progress Bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
+                      <span style={{ color: 'var(--text-muted)' }}>
+                        {percent}% Selesai
+                      </span>
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: isLowSessions ? 'var(--danger)' : '#10B981'
+                        }}
+                      >
+                        {sisa} Sesi Tersisa
+                      </span>
+                    </div>
+
+                    {/* Progress Bar (0% saat awal, terisi seiring kehadiran absensi) */}
                     <div
                       style={{
-                        height: 6,
+                        height: 7,
                         background: 'var(--bg-surface-secondary)',
                         borderRadius: 'var(--radius-full)',
                         overflow: 'hidden'
@@ -426,50 +453,54 @@ export default function SiswaPage() {
                           width: `${percent}%`,
                           height: '100%',
                           background: isLowSessions
-                            ? 'var(--danger)'
-                            : 'var(--primary-gradient)',
+                            ? 'linear-gradient(90deg, #f59e0b 0%, #ef4444 100%)'
+                            : 'linear-gradient(90deg, #10b981 0%, #6366f1 100%)',
                           borderRadius: 'var(--radius-full)',
                           transition: 'width 0.3s'
                         }}
                       />
                     </div>
 
-                    {/* Session Quick Adjust Buttons */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Sesi:</span>
-                      <button
-                        className="quick-action-link"
-                        style={{ color: 'var(--danger)', fontSize: 11 }}
-                        onClick={() => adjustStudentSessions(student.id, -1)}
-                        title="Kurangi 1 Sesi (Selesai Les)"
+                    {/* Auto-Sync Indicator & Manual Adjustment */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, flexWrap: 'wrap', gap: 6 }}>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 10.5,
+                          fontWeight: 700,
+                          color: '#10B981',
+                          background: 'rgba(16, 185, 129, 0.10)',
+                          padding: '2px 6px',
+                          borderRadius: 4
+                        }}
+                        title="Pertemuan otomatis bertambah & sisa sesi terpotong saat siswa absen"
                       >
-                        <MinusCircle size={14} />
-                        <span>-1</span>
-                      </button>
-                      <button
-                        className="quick-action-link"
-                        style={{ color: 'var(--success)', fontSize: 11 }}
-                        onClick={() => adjustStudentSessions(student.id, 1)}
-                        title="Tambah 1 Sesi"
-                      >
-                        <PlusCircle size={14} />
-                        <span>+1</span>
-                      </button>
-                      {isLowSessions && (
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            color: 'var(--danger)',
-                            background: 'var(--danger-light)',
-                            padding: '1px 6px',
-                            borderRadius: 4,
-                            marginLeft: 4
-                          }}
+                        <Zap size={11} /> Auto-Sync Absensi
+                      </span>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Koreksi:</span>
+                        <button
+                          className="quick-action-link"
+                          style={{ color: 'var(--danger)', fontSize: 10.5, padding: '1px 5px', border: '1px solid var(--border-subtle)', borderRadius: 4 }}
+                          onClick={() => adjustStudentSessions(student.id, -1)}
+                          title="Koreksi Manual: Kurangi 1 Sesi Sisa"
                         >
-                          ⚠️ Sisa Kritis
-                        </span>
-                      )}
+                          <MinusCircle size={12} />
+                          <span>-1</span>
+                        </button>
+                        <button
+                          className="quick-action-link"
+                          style={{ color: 'var(--success)', fontSize: 10.5, padding: '1px 5px', border: '1px solid var(--border-subtle)', borderRadius: 4 }}
+                          onClick={() => adjustStudentSessions(student.id, 1)}
+                          title="Koreksi Manual: Tambah 1 Sesi Sisa"
+                        >
+                          <PlusCircle size={12} />
+                          <span>+1</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -614,6 +645,30 @@ export default function SiswaPage() {
                     onChange={e => setFormData({ ...formData, telepon: e.target.value })}
                     placeholder="0812-XXXX-XXXX"
                     required
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
+                  <label className="form-label">Email Siswa / Akun Login (Opsional)</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="siswa@gmail.com"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Kata Sandi Login Siswa {modalMode === 'add' ? '*' : '(Opsional)'}</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={formData.password}
+                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    placeholder={modalMode === 'add' ? 'Minimal 6 karakter (cth: 123456)' : 'Kosongkan jika tidak diganti'}
+                    required={modalMode === 'add'}
                   />
                 </div>
               </div>

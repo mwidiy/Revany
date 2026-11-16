@@ -87,13 +87,23 @@ export default function TodaySchedule() {
 
                 <div className="schedule-meta">
                   <div className="participant-pair">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.siswa.avatar}
-                      alt={item.siswa.nama}
-                      className="mini-avatar"
-                      title={`Siswa: ${item.siswa.nama}`}
-                    />
+                    <span
+                      style={{
+                        width: 26,
+                        height: 26,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)',
+                        color: '#4338ca',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 800,
+                        fontSize: 11,
+                        flexShrink: 0
+                      }}
+                    >
+                      {item.siswa.nama.charAt(0).toUpperCase()}
+                    </span>
                     <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: 13 }}>
                       {item.siswa.nama}
                     </span>

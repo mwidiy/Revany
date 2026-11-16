@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { AppProvider } from '@/context/AppContext';
-import Sidebar from '@/components/layout/Sidebar';
-import Topbar from '@/components/layout/Topbar';
+import AppShell from '@/components/layout/AppShell';
 import PresensiModal from '@/components/modals/PresensiModal';
 import JadwalModal from '@/components/modals/JadwalModal';
 import SiswaModal from '@/components/modals/SiswaModal';
@@ -28,22 +28,20 @@ export default function RootLayout({
     <html lang="id" data-theme="light">
       <body>
         <ThemeProvider>
-          <AppProvider>
-            <div className="app-layout">
-              <Sidebar />
-              <div className="main-wrapper">
-                <Topbar />
+          <AuthProvider>
+            <AppProvider>
+              <AppShell>
                 {children}
-              </div>
-            </div>
+              </AppShell>
 
-            {/* Global Interactive Modals */}
-            <PresensiModal />
-            <JadwalModal />
-            <SiswaModal />
-            <CommandPalette />
-            <ToastContainer />
-          </AppProvider>
+              {/* Global Interactive Modals */}
+              <PresensiModal />
+              <JadwalModal />
+              <SiswaModal />
+              <CommandPalette />
+              <ToastContainer />
+            </AppProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

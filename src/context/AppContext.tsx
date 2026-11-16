@@ -45,6 +45,8 @@ interface AppContextType {
   refreshStudents: () => Promise<void>;
   addNewStudent: (studentData: {
     nama: string;
+    email?: string;
+    password?: string;
     jenjang: 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
     kelas: string;
     telepon: string;
@@ -220,6 +222,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Student Actions
   const addNewStudent = async (data: {
     nama: string;
+    email?: string;
+    password?: string;
     jenjang: 'TK' | 'Prasekolah' | 'SD' | 'SMP' | 'SMA' | 'UTBK / Kedinasan';
     kelas: string;
     telepon: string;
@@ -236,6 +240,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const total = data.total_sesi_paket ?? sisa;
       const created = await studentService.create({
         nama: data.nama,
+        email: data.email || null,
+        password: data.password || '123456',
         jenjang: data.jenjang,
         kelas: data.kelas,
         telepon: data.telepon,
@@ -348,9 +354,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const toggleMobileSidebar = () => setIsMobileSidebarOpen(prev => !prev);
   const closeMobileSidebar = () => setIsMobileSidebarOpen(false);
 
-  const recordPresensi = (scheduleId: string, status: string, notes: string) => {
+  const recordPresensi = async (scheduleId: string, status: string, notes: string) => {
     const target = schedules.find(s => s.id === scheduleId);
     const studentName = target ? target.siswa.nama : 'Siswa';
+
+    // Otomatis sinkronisasi: Jika siswa tercatat Hadir, potong sisa sesi di database
+    if (status === 'Hadir' && target) {
+      const matchedStudent = students.find(
+        s =>
+          s.nama.toLowerCase().includes(studentName.toLowerCase()) ||
+          studentName.toLowerCase().includes(s.nama.toLowerCase())
+      );
+      if (matchedStudent) {
+        try {
+          const updated = await studentService.adjustSessions(matchedStudent.id, -1);
+          setStudents(prev => prev.map(s => (s.id === matchedStudent.id ? updated : s)));
+        } catch (e) {
+          console.warn('Gagal sinkronisasi sesi siswa otomatis:', e);
+        }
+      }
+    }
 
     setSchedules(prev =>
       prev.map(item => {
@@ -371,7 +394,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         waktu: 'Baru saja',
         tipe: 'presensi',
         judul: `Presensi Terverifikasi (${status})`,
-        deskripsi: `Admin mencatat presensi untuk ${studentName} (${target?.mapel || 'Sesi Les'})`,
+        deskripsi: `Presensi ${status} untuk ${studentName} (${target?.mapel || 'Sesi Les'}) • Sesi otomatis disinkronkan`,
         icon: 'CheckCircle',
         color: status === 'Hadir' ? 'emerald' : status === 'Alpha' ? 'rose' : 'amber'
       },
@@ -379,7 +402,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ]);
 
     closePresensiModal();
-    showToast(`Presensi berhasil dicatat untuk ${studentName} (${status})! 🎉`, 'success');
+    showToast(`Presensi tercatat untuk ${studentName} (${status}) • Sesi otomatis berkurang 1! 🎉`, 'success');
   };
 
   const addNewSchedule = (data: { namaSiswa: string; tentor: string; mapel: string; waktu: string; metode: string }) => {
@@ -391,12 +414,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       jenjang: 'Siswa Terdaftar',
       siswa: {
         nama: data.namaSiswa,
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+        avatar: '',
         kelas: 'Kelas Reguler'
       },
       tentor: {
         nama: data.tentor,
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80'
+        avatar: ''
       },
       metode: data.metode,
       status: 'upcoming',

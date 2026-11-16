@@ -123,6 +123,7 @@ export default function TentorPage() {
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
+    password: '',
     telepon: '',
     mapel: '',
     status: 'aktif',
@@ -159,6 +160,7 @@ export default function TentorPage() {
     setFormData({
       nama: '',
       email: '',
+      password: '',
       telepon: '',
       mapel: '',
       status: 'aktif',
@@ -175,6 +177,7 @@ export default function TentorPage() {
     setFormData({
       nama: tentor.nama,
       email: tentor.email || '',
+      password: tentor.password || '',
       telepon: tentor.telepon || '',
       mapel: tentor.mapel,
       status: tentor.status || 'aktif',
@@ -187,7 +190,7 @@ export default function TentorPage() {
   // Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.nama || !formData.mapel) return;
+    if (!formData.nama || !formData.mapel || !formData.email) return;
 
     setIsSubmitting(true);
     try {
@@ -195,6 +198,7 @@ export default function TentorPage() {
         await addNewTentor({
           nama: formData.nama,
           email: formData.email,
+          password: formData.password || '123456',
           telepon: formData.telepon,
           mapel: formData.mapel,
           status: formData.status,
@@ -208,6 +212,7 @@ export default function TentorPage() {
         await updateTentor(selectedTentor.id, {
           nama: formData.nama,
           email: formData.email,
+          ...(formData.password ? { password: formData.password } : {}),
           telepon: formData.telepon,
           mapel: formData.mapel,
           status: formData.status,
@@ -653,6 +658,31 @@ export default function TentorPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div className="form-group">
+                  <label className="form-label">Email Akun Login (Tentor) *</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="nama@sahabatngajar.com"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Kata Sandi Login {modalMode === 'add' ? '*' : '(Opsional)'}</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={formData.password}
+                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    placeholder={modalMode === 'add' ? 'Minimal 6 karakter (cth: 123456)' : 'Kosongkan jika tidak diganti'}
+                    required={modalMode === 'add'}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
                   <label className="form-label">No. WhatsApp</label>
                   <input
                     type="tel"
@@ -661,31 +691,6 @@ export default function TentorPage() {
                     onChange={e => setFormData({ ...formData, telepon: e.target.value })}
                     placeholder="0812-3456-7890"
                   />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    className="form-input"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="nama@sahabatngajar.com"
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div className="form-group">
-                  <label className="form-label">Status Mengajar</label>
-                  <select
-                    className="form-select"
-                    value={formData.status}
-                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                  >
-                    <option value="aktif">Aktif Mengajar</option>
-                    <option value="cuti">Cuti Sementara</option>
-                    <option value="nonaktif">Nonaktif</option>
-                  </select>
                 </div>
                 <div className="form-group">
                   <label className="form-label">No. Rekening Bank</label>
@@ -697,6 +702,19 @@ export default function TentorPage() {
                     placeholder="BCA 8271928172 a.n Dimas Arya"
                   />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Status Mengajar</label>
+                <select
+                  className="form-select"
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                >
+                  <option value="aktif">Aktif Mengajar</option>
+                  <option value="cuti">Cuti Sementara</option>
+                  <option value="nonaktif">Nonaktif</option>
+                </select>
               </div>
 
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 24 }}>
