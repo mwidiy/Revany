@@ -32,58 +32,118 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Helper untuk menghasilkan berbagai varian format nomor telepon (08xx, +62xx, 62xx, serta pembersih spasi/strip)
+  const buildSearchConditions = (cleanId: string) => {
+    const cleanEmail = cleanId.toLowerCase();
+    const digitsOnly = cleanId.replace(/\D/g, '');
+    const conditions = [
+      `email.ilike.${cleanEmail}`,
+      `nama.ilike.%${cleanId}%`
+    ];
+
+    const phoneSet = new Set<string>();
+    phoneSet.add(cleanId);
+    if (digitsOnly.length >= 7) {
+      phoneSet.add(digitsOnly);
+      if (digitsOnly.startsWith('62')) {
+        phoneSet.add('+' + digitsOnly);
+        phoneSet.add('0' + digitsOnly.slice(2));
+      } else if (digitsOnly.startsWith('0')) {
+        phoneSet.add('+62' + digitsOnly.slice(1));
+        phoneSet.add('62' + digitsOnly.slice(1));
+      }
+    }
+
+    for (const p of phoneSet) {
+      conditions.push(`telepon.eq.${p}`);
+    }
+
+    return conditions.join(',');
+  };
+
   // Handle Form Submit (Real Supabase Auth verification against tentors & students)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanId = identifier.trim();
-    if (!cleanId || !password.trim()) {
+    const cleanPassword = password.trim();
+
+    if (!cleanId || !cleanPassword) {
       showToast('Silakan masukkan akun dan kata sandi login', 'warning');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      const orFilter = buildSearchConditions(cleanId);
+
+      // 1. Coba verifikasi peran sesuai tab yang dipilih terlebih dahulu
       if (activeRole === 'tentor') {
-        const cleanEmail = cleanId.toLowerCase();
-        const { data, error } = await supabase
+        const { data: tentorList, error: tErr } = await supabase
           .from('tentors')
           .select('*')
-          .or(`email.ilike.${cleanEmail},nama.ilike.%${cleanId}%`)
-          .eq('password', password.trim())
-          .maybeSingle();
+          .or(orFilter)
+          .eq('password', cleanPassword)
+          .limit(1);
 
-        if (error || !data) {
-          showToast('Email/Nama atau kata sandi tentor tidak cocok. Silakan periksa kembali.', 'danger');
+        if (!tErr && tentorList && tentorList.length > 0) {
+          const tentor = tentorList[0];
+          loginAsTentor(tentor as any);
+          showToast(`Selamat datang kembali, ${tentor.nama}!`, 'success');
+          router.push('/');
           return;
         }
 
-        loginAsTentor(data as any);
-        showToast(`Selamat datang kembali, ${data.nama}!`, 'success');
-        router.push('/');
-      } else {
-        const cleanInput = cleanId;
-        const cleanEmail = cleanInput.toLowerCase();
-        const phoneAlt = cleanInput.startsWith('0')
-          ? `+62${cleanInput.slice(1)}`
-          : cleanInput.startsWith('+62')
-          ? `0${cleanInput.slice(3)}`
-          : cleanInput;
-
-        const { data, error } = await supabase
+        // Fallback cerdas: Jika user lupa ganti tab dan ternyata akun terdaftar di Siswa
+        const { data: studentFallback } = await supabase
           .from('students')
           .select('*')
-          .or(`email.ilike.${cleanEmail},nama.ilike.%${cleanInput}%,telepon.eq.${cleanInput},telepon.eq.${phoneAlt}`)
-          .eq('password', password.trim())
-          .maybeSingle();
+          .or(orFilter)
+          .eq('password', cleanPassword)
+          .limit(1);
 
-        if (error || !data) {
-          showToast('Akun (Email / Nama / No. WhatsApp) atau kata sandi tidak cocok.', 'danger');
+        if (studentFallback && studentFallback.length > 0) {
+          const student = studentFallback[0];
+          loginAsStudent(student as any);
+          showToast(`Selamat datang di Portal Siswa, ${student.nama}!`, 'success');
+          router.push('/portal-siswa');
           return;
         }
 
-        loginAsStudent(data as any);
-        showToast(`Selamat datang di Portal Siswa, ${data.nama}!`, 'success');
-        router.push('/portal-siswa');
+        showToast('Email/No. HP atau kata sandi tidak cocok. Silakan periksa kembali.', 'danger');
+      } else {
+        // Tab Siswa dipilih
+        const { data: studentList, error: sErr } = await supabase
+          .from('students')
+          .select('*')
+          .or(orFilter)
+          .eq('password', cleanPassword)
+          .limit(1);
+
+        if (!sErr && studentList && studentList.length > 0) {
+          const student = studentList[0];
+          loginAsStudent(student as any);
+          showToast(`Selamat datang di Portal Siswa, ${student.nama}!`, 'success');
+          router.push('/portal-siswa');
+          return;
+        }
+
+        // Fallback cerdas: Jika user lupa ganti tab dan ternyata akun terdaftar di Tentor
+        const { data: tentorFallback } = await supabase
+          .from('tentors')
+          .select('*')
+          .or(orFilter)
+          .eq('password', cleanPassword)
+          .limit(1);
+
+        if (tentorFallback && tentorFallback.length > 0) {
+          const tentor = tentorFallback[0];
+          loginAsTentor(tentor as any);
+          showToast(`Selamat datang kembali, ${tentor.nama}!`, 'success');
+          router.push('/');
+          return;
+        }
+
+        showToast('Akun (Email / Nama / No. WhatsApp) atau kata sandi tidak cocok.', 'danger');
       }
     } catch (err: any) {
       showToast('Terjadi kendala saat login: ' + (err?.message || 'Koneksi gagal'), 'danger');
@@ -410,7 +470,7 @@ export default function LoginPage() {
                       marginBottom: 6
                     }}
                   >
-                    Email Akun Tentor
+                    Email Akun atau No. WhatsApp Tentor
                   </label>
                   <div style={{ position: 'relative' }}>
                     <div
@@ -428,8 +488,8 @@ export default function LoginPage() {
                       <Mail size={16} />
                     </div>
                     <input
-                      type="email"
-                      placeholder="nama@sahabatngajar.com"
+                      type="text"
+                      placeholder="email@sahabatngajar.com atau 0812-XXXX-XXXX"
                       value={identifier}
                       onChange={e => setIdentifier(e.target.value)}
                       required
