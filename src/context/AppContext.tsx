@@ -1,18 +1,21 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { KpiData, ScheduleItem, Tutor, ActivityItem, ToastNotification, Student } from '@/types';
+import { KpiData, ScheduleItem, Tutor, ActivityItem, ToastNotification, Student, LearningMaterial } from '@/types';
 import { initialKpi, initialSchedules, initialActivities } from '@/lib/initialData';
 import { tentorService } from '@/services/tentorService';
 import { studentService } from '@/services/studentService';
+import { learningService } from '@/services/learningService';
 
 interface AppContextType {
   kpi: KpiData;
   schedules: ScheduleItem[];
   tutors: Tutor[];
   students: Student[];
+  materials: LearningMaterial[];
   isLoadingTentors: boolean;
   isLoadingStudents: boolean;
+  isLoadingMaterials: boolean;
   activities: ActivityItem[];
   toasts: ToastNotification[];
   scheduleFilter: 'all' | 'ongoing' | 'upcoming';
@@ -41,6 +44,8 @@ interface AppContextType {
   addNewTentor: (tentorData: Omit<Tutor, 'id' | 'created_at' | 'updated_at'>) => Promise<Tutor>;
   updateTentor: (id: string, updates: Partial<Tutor>) => Promise<Tutor>;
   deleteTentor: (id: string) => Promise<boolean>;
+  // Live Database Actions for Materials
+  refreshMaterials: () => Promise<void>;
   // Live Database Actions for Students
   refreshStudents: () => Promise<void>;
   addNewStudent: (studentData: {
@@ -75,8 +80,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [schedules, setSchedules] = useState<ScheduleItem[]>(initialSchedules);
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [materials, setMaterials] = useState<LearningMaterial[]>([]);
   const [isLoadingTentors, setIsLoadingTentors] = useState<boolean>(true);
   const [isLoadingStudents, setIsLoadingStudents] = useState<boolean>(true);
+  const [isLoadingMaterials, setIsLoadingMaterials] = useState<boolean>(true);
   const [activities, setActivities] = useState<ActivityItem[]>(initialActivities);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
   const [scheduleFilter, setScheduleFilter] = useState<'all' | 'ongoing' | 'upcoming'>('all');
@@ -149,10 +156,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Fetch Materials
+  const refreshMaterials = async () => {
+    setIsLoadingMaterials(true);
+    try {
+      const data = await learningService.getMaterials();
+      setMaterials(data);
+    } catch (err: any) {
+      console.error('Gagal memuat materi:', err);
+    } finally {
+      setIsLoadingMaterials(false);
+    }
+  };
+
   // Initial Data Fetch on Mount
   useEffect(() => {
     refreshTentors();
     refreshStudents();
+    refreshMaterials();
   }, []);
 
   // Tentor Actions
@@ -453,8 +474,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         schedules,
         tutors,
         students,
+        materials,
         isLoadingTentors,
         isLoadingStudents,
+        isLoadingMaterials,
         activities,
         toasts,
         scheduleFilter,
@@ -486,6 +509,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateStudent,
         deleteStudent,
         adjustStudentSessions,
+        refreshMaterials,
         recordPresensi,
         addNewSchedule,
         showToast,

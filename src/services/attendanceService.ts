@@ -341,5 +341,142 @@ export const attendanceService = {
     }
 
     return (data || []) as unknown as AttendanceRecord[];
+  },
+
+  /**
+   * REKAP PERTEMUAN: Mencatat kilas balik pertemuan les yang telah selesai
+   * (Topik materi yang diajarkan, evaluasi pemahaman siswa, dan PR/tugas)
+   */
+  async createMeetingRecap(payload: {
+    tentor_id?: string;
+    student_id: string;
+    mapel: string;
+    judul_sesi: string;
+    tanggal: string;
+    jam_mulai?: string;
+    jam_selesai?: string;
+    catatan: string;
+    tugas_pr?: string;
+    status_kehadiran?: 'hadir' | 'izin' | 'sakit' | 'alpha';
+    potong_sesi?: boolean;
+    metode?: string;
+  }): Promise<AttendanceSession> {
+    const codeSuffix = Math.floor(1000 + Math.random() * 9000);
+    const kodeUnik = `RKP-${codeSuffix}`;
+    const metode = payload.metode || 'Offline';
+    const jamInfo = payload.jam_mulai && payload.jam_selesai ? `${payload.jam_mulai} - ${payload.jam_selesai}` : '15:30 - 17:00';
+    
+    // Format rapi catatan sesi agar menyimpan info metode & PR
+    let formattedNotes = `[METODE: ${metode}] [JAM: ${jamInfo}]\n${payload.catatan}`;
+    if (payload.tugas_pr && payload.tugas_pr.trim()) {
+      formattedNotes += `\n[PR / TUGAS]: ${payload.tugas_pr.trim()}`;
+    }
+
+    // 1. Simpan sesi pertemuan
+    const { data: sessionData, error: sessionError } = await db
+      .from('attendance_sessions')
+      .insert([
+        {
+          tentor_id: payload.tentor_id || null,
+          mapel: payload.mapel,
+          judul_sesi: payload.judul_sesi.trim(),
+          kode_unik: kodeUnik,
+          tanggal: payload.tanggal,
+          status: 'ditutup', // Sesi sudah terlaksana
+          waktu_mulai: payload.jam_mulai ? `${payload.tanggal}T${payload.jam_mulai}:00.000Z` : new Date().toISOString(),
+          waktu_selesai: payload.jam_selesai ? `${payload.tanggal}T${payload.jam_selesai}:00.000Z` : new Date().toISOString(),
+          catatan: formattedNotes
+        }
+      ])
+      .select(`
+        *,
+        tentor:tentor_id (
+          id,
+          nama,
+          mapel,
+          avatar
+        )
+      `)
+      .single();
+
+    if (sessionError) {
+      console.error('Error creating meeting recap session:', sessionError.message);
+      throw new Error(`Gagal menyimpan sesi pertemuan: ${sessionError.message}`);
+    }
+
+    // 2. Simpan record kehadiran siswa terkait
+    const { error: recordError } = await db
+      .from('attendance_records')
+      .insert([
+        {
+          session_id: sessionData.id,
+          student_id: payload.student_id,
+          kode_digunakan: kodeUnik,
+          waktu_absen: new Date().toISOString(),
+          status: payload.status_kehadiran || 'hadir',
+          catatan: payload.catatan
+        }
+      ]);
+
+    if (recordError) {
+      console.error('Error creating meeting recap record:', recordError.message);
+    }
+
+    // 3. Potong sisa kuota sesi siswa jika diaktifkan
+    if (payload.potong_sesi) {
+      try {
+        await studentService.adjustSessions(payload.student_id, -1);
+      } catch (err) {
+        console.warn('Gagal memotong kuota sesi siswa:', err);
+      }
+    }
+
+    return sessionData as unknown as AttendanceSession;
+  },
+
+  /**
+   * REKAP PERTEMUAN: Mengambil seluruh riwayat rekap pertemuan belajar
+   */
+  async getMeetingRecaps(): Promise<AttendanceSession[]> {
+    const { data, error } = await db
+      .from('attendance_sessions')
+      .select(`
+        *,
+        tentor:tentor_id (
+          id,
+          nama,
+          mapel,
+          avatar,
+          telepon
+        ),
+        records:attendance_records (
+          id,
+          session_id,
+          student_id,
+          kode_digunakan,
+          waktu_absen,
+          status,
+          catatan,
+          student:student_id (
+            id,
+            nama,
+            kelas,
+            jenjang,
+            avatar,
+            sekolah,
+            sisa_sesi,
+            telepon
+          )
+        )
+      `)
+      .order('tanggal', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching meeting recaps:', error.message);
+      return [];
+    }
+
+    return (data || []) as unknown as AttendanceSession[];
   }
 };

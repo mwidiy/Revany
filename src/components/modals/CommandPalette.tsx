@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
-import { Search, User, GraduationCap } from 'lucide-react';
+import { Search, User, GraduationCap, BookOpen, History, Calendar, Users } from 'lucide-react';
 
 export default function CommandPalette() {
+  const router = useRouter();
   const {
     isSearchModalOpen,
     openSearchModal,
@@ -46,6 +48,30 @@ export default function CommandPalette() {
     isTutor: boolean;
     action: () => void;
   }> = [];
+
+  // Menu Navigasi Cepat
+  const navMenus = [
+    { title: 'Bank Materi & Modul Belajar', path: '/materi', subtitle: 'Handout, modul latihan, kisi-kisi' },
+    { title: 'Rekap Pertemuan (Kilas Balik)', path: '/rekap-pertemuan', subtitle: 'Jurnal belajar kemarin & evaluasi' },
+    { title: 'Jadwal Les & Kelas', path: '/jadwal', subtitle: 'Kalender jadwal tentor dan siswa' },
+    { title: 'Data Siswa (Admin)', path: '/siswa', subtitle: 'Manajemen siswa dan kuota sesi' },
+    { title: 'Data Tentor (Admin)', path: '/tentor', subtitle: 'Daftar tentor dan tarif fee' }
+  ];
+
+  navMenus.forEach(menu => {
+    if (!q || menu.title.toLowerCase().includes(q) || menu.subtitle.toLowerCase().includes(q)) {
+      results.push({
+        type: 'Navigasi Menu',
+        title: menu.title,
+        subtitle: menu.subtitle,
+        isTutor: false,
+        action: () => {
+          closeSearchModal();
+          router.push(menu.path);
+        }
+      });
+    }
+  });
 
   schedules.forEach(s => {
     if (!q || s.siswa.nama.toLowerCase().includes(q) || s.mapel.toLowerCase().includes(q)) {

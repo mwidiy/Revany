@@ -72,6 +72,64 @@ export const learningService = {
   },
 
   /**
+   * Memperbarui materi pelajaran
+   */
+  async updateMaterial(
+    id: string,
+    payload: Partial<{
+      tentor_id?: string | null;
+      judul: string;
+      mapel: string;
+      jenjang: string;
+      deskripsi?: string | null;
+      file_url?: string | null;
+      tipe_file?: 'pdf' | 'video' | 'doc' | 'link';
+    }>
+  ): Promise<LearningMaterial> {
+    const { data, error } = await db
+      .from('learning_materials')
+      .update({
+        ...payload,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select(`
+        *,
+        tentor:tentor_id (
+          id,
+          nama,
+          mapel,
+          avatar
+        )
+      `)
+      .single();
+
+    if (error) {
+      console.error('Error updating learning material:', error.message);
+      throw error;
+    }
+
+    return data as LearningMaterial;
+  },
+
+  /**
+   * Menghapus materi pelajaran
+   */
+  async deleteMaterial(id: string): Promise<boolean> {
+    const { error } = await db
+      .from('learning_materials')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting learning material:', error.message);
+      throw error;
+    }
+
+    return true;
+  },
+
+  /**
    * Mengambil jadwal pelajaran siswa
    */
   async getSchedulesByStudent(studentId?: string): Promise<LearningSchedule[]> {

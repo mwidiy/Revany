@@ -10,6 +10,7 @@ import {
   UserCheck,
   GraduationCap,
   Users,
+  BookOpen,
   BookOpenCheck,
   History,
   Wallet,
@@ -24,7 +25,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { tutors, students, schedules, isMobileSidebarOpen, closeMobileSidebar } = useApp();
+  const { tutors, students, schedules, materials, isMobileSidebarOpen, closeMobileSidebar } = useApp();
   const { currentUser, logout } = useAuth();
 
   return (
@@ -116,14 +117,15 @@ export default function Sidebar() {
             <span>Data Siswa (Admin)</span>
             <span className="nav-badge">{students.length}</span>
           </Link>
-          <a href="#laporan-belajar" className="nav-item">
-            <BookOpenCheck size={18} />
-            <span>Laporan Belajar</span>
-          </a>
-          <a href="#rekap-pertemuan" className="nav-item">
+          <Link href="/materi" className={`nav-item ${pathname === '/materi' ? 'active' : ''}`}>
+            <BookOpen size={18} />
+            <span>Materi Pelajaran</span>
+            <span className="nav-badge">{materials.length}</span>
+          </Link>
+          <Link href="/rekap-pertemuan" className={`nav-item ${pathname === '/rekap-pertemuan' ? 'active' : ''}`}>
             <History size={18} />
             <span>Rekap Pertemuan</span>
-          </a>
+          </Link>
 
           <div className="nav-category">Keuangan & Dokumen</div>
           <a href="#fee-tentor" className="nav-item">
